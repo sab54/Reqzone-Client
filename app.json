@@ -1,0 +1,27 @@
+{
+    "expo": {
+        "name": "ResQZone",
+        "slug": "ResQZone",
+        "platforms": ["ios", "android"],
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./src/assets/icon.png",
+        "splash": {
+            "image": "./src/assets/splash-icon.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#ffffff"
+        },
+        "assetBundlePatterns": ["**/*"],
+        "ios": {
+            "bundleIdentifier": "com.64bitme.resqzone",
+            "buildNumber": "1.0.0",
+            "supportsTablet": true
+        },
+        "android": {
+            "package": "com.64bitme.resqzone",
+            "versionCode": 1
+        },
+        "plugins": ["expo-location", "expo-font", "expo-localization"],
+        "newArchEnabled": true
+    }
+}
