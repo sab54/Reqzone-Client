@@ -21,7 +21,7 @@ import { useNavigation } from '@react-navigation/native';
 import { CountryPicker } from 'react-native-country-codes-picker';
 import { BlurView } from 'expo-blur';
 import { requestOtp } from '../store/actions/loginActions';
-import { DEV_MODE } from '../utils/config';
+import { autoSetOTP } from '../utils/config';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -104,7 +104,7 @@ const LoginScreen = () => {
                 countryCode: selectedCountryCode,
                 userId: result.user_id,
                 otpCode: result.otp_code,
-                autoFillOtp: DEV_MODE,
+                autoFillOtp: autoSetOTP,
             });
         } catch (err) {
             setErrorMessage(err);
