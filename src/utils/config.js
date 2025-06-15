@@ -1,8 +1,9 @@
-export const DEV_MODE = false; // ← Flip this to false to disable mode
+export const DEV_MODE = true; // ← Flip this to false to disable mode
+export const isLocalServer = false; // ← Flip this to false to disable mode
 export const autoSetOTP = true; // ← Flip this to false to disable mode
 export const External_API_MODE = false; // ← Flip this to false to enable mode
 
-export const BASE_URL = DEV_MODE
+export const BASE_URL = isLocalServer
     ? 'http://192.168.1.99:3005'
     : 'https://resqzone.64bitme.com'; // 🔁 Replace with your base API URL. Does not work with localhost
 export const OPENWEATHER_API_KEY =
