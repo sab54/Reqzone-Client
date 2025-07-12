@@ -1,9 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
+import {
+    fetchEmergencyContacts,
+    addEmergencyContact,
+    deleteEmergencyContact,
+} from '../actions/emergencyActions';
 
 const initialState = {
     countryCode: 'US',
     customName: '',
     customNumber: '',
+    contacts: [],
+    loading: false,
+    error: null,
 };
 
 const emergencySlice = createSlice({
@@ -25,6 +33,55 @@ const emergencySlice = createSlice({
             state.customName = customName;
             state.customNumber = customNumber;
         },
+        // Manual fallback (optional, still safe to keep)
+        setContacts: (state, action) => {
+            state.contacts = action.payload;
+        },
+        addContact: (state, action) => {
+            state.contacts.push(action.payload);
+        },
+        removeContact: (state, action) => {
+            state.contacts = state.contacts.filter(
+                (c) => c.id !== action.payload
+            );
+        },
+        setContactsLoading: (state) => {
+            state.loading = true;
+            state.error = null;
+        },
+        setContactsError: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            // Fetch contacts
+            .addCase(fetchEmergencyContacts.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchEmergencyContacts.fulfilled, (state, action) => {
+                state.contacts = action.payload;
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(fetchEmergencyContacts.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || 'Failed to fetch contacts';
+            })
+
+            // Add contact
+            .addCase(addEmergencyContact.fulfilled, (state, action) => {
+                state.contacts.unshift(action.payload);
+            })
+
+            // Delete contact
+            .addCase(deleteEmergencyContact.fulfilled, (state, action) => {
+                state.contacts = state.contacts.filter(
+                    (c) => c.id !== action.payload
+                );
+            });
     },
 });
 
@@ -33,5 +90,11 @@ export const {
     setCustomName,
     setCustomNumber,
     setEmergencySettings,
+    setContacts,
+    addContact,
+    removeContact,
+    setContactsLoading,
+    setContactsError,
 } = emergencySlice.actions;
+
 export default emergencySlice.reducer;

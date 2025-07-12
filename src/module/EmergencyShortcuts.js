@@ -12,13 +12,22 @@ import {
     Alert,
     Modal,
     Pressable,
+    KeyboardAvoidingView,
+    TouchableWithoutFeedback,
+    Keyboard,
 } from 'react-native';
 import * as Location from 'expo-location';
 import * as Localization from 'expo-localization';
+import * as Network from 'expo-network';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadEmergencySettings } from '../store/actions/emergencyActions';
+import {
+    fetchEmergencyContacts,
+    addEmergencyContact,
+    deleteEmergencyContact,
+} from '../store/actions/emergencyActions';
 import AddContactModal from '../modals/AddContactModal';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 if (
     Platform.OS === 'android' &&
@@ -36,61 +45,91 @@ const COUNTRY_NUMBERS = {
     DE: '112',
 };
 
-const EMERGENCY_SERVICES = [
-    {
-        label: 'Police',
-        icon: 'shield',
-        colorKey: 'error',
-        description: 'Contact law enforcement for immediate safety.',
-        mapQuery: 'Police Station',
-        presetMessages: [
-            'Help! I’m in danger. Please send police.',
-            'Urgent! Police needed immediately.',
-            'Emergency: I feel unsafe and need help now.',
-        ],
-    },
-    {
-        label: 'Fire',
-        icon: 'flame',
-        colorKey: 'warning',
-        description: 'Reach fire services in case of fire or gas hazards.',
-        mapQuery: 'Fire Station',
-        presetMessages: [
-            'There’s a fire! I need help.',
-            'Smoke detected, please send fire service.',
-            'Emergency: Fire hazard at my location.',
-        ],
-    },
-    {
-        label: 'Medical',
-        icon: 'medkit',
-        colorKey: 'success',
-        description: 'Call emergency medical responders for health crises.',
-        mapQuery: 'Hospital',
-        presetMessages: [
-            'Medical emergency! Please assist.',
-            'I need an ambulance immediately.',
-            'Health emergency, urgent care needed.',
-        ],
-    },
-];
-
 const EmergencyShortcuts = ({ theme }) => {
     const dispatch = useDispatch();
+    const currentUserId = useSelector((state) => state.auth.user?.id);
+    const { contacts = [] } = useSelector((state) => state.emergency);
     const [expanded, setExpanded] = useState({});
     const [pulse] = useState(new Animated.Value(1));
-    const [customContacts, setCustomContacts] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [smsModalVisible, setSmsModalVisible] = useState(false);
     const [selectedService, setSelectedService] = useState(null);
-
-    const regionCode = Localization.region || 'US';
-    const defaultNumber = COUNTRY_NUMBERS[regionCode] || '911';
+    const [defaultNumber, setDefaultNumber] = useState('911');
+    const [confirmRemoveVisible, setConfirmRemoveVisible] = useState(false);
+    const [selectedContact, setSelectedContact] = useState(null);
 
     useEffect(() => {
         startPulse();
-        dispatch(loadEmergencySettings());
-    }, [dispatch]);
+        if (currentUserId) {
+            dispatch(fetchEmergencyContacts(currentUserId));
+        }
+        determineEmergencyNumber();
+    }, [currentUserId]);
+
+    const determineEmergencyNumber = async () => {
+        try {
+            const network = await Network.getNetworkStateAsync();
+            if (network.isInternetReachable) {
+                const { status } =
+                    await Location.requestForegroundPermissionsAsync();
+                if (status === 'granted') {
+                    const loc = await Location.getCurrentPositionAsync({});
+                    const places = await Location.reverseGeocodeAsync(
+                        loc.coords
+                    );
+                    const code = places[0]?.isoCountryCode;
+                    if (code && COUNTRY_NUMBERS[code]) {
+                        setDefaultNumber(COUNTRY_NUMBERS[code]);
+                        return;
+                    }
+                }
+            }
+            const region = Localization.region;
+            setDefaultNumber(COUNTRY_NUMBERS[region] || '911');
+        } catch (err) {
+            const region = Localization.region;
+            setDefaultNumber(COUNTRY_NUMBERS[region] || '911');
+        }
+    };
+
+    const EMERGENCY_SERVICES = [
+        {
+            label: 'Police',
+            icon: 'shield',
+            colorKey: 'error',
+            description: 'Contact law enforcement for immediate safety.',
+            mapQuery: 'Police Station',
+            presetMessages: [
+                'Help! I’m in danger. Please send police.',
+                'Urgent! Police needed immediately.',
+                'Emergency: I feel unsafe and need help now.',
+            ],
+        },
+        {
+            label: 'Fire',
+            icon: 'flame',
+            colorKey: 'warning',
+            description: 'Reach fire services in case of fire or gas hazards.',
+            mapQuery: 'Fire Station',
+            presetMessages: [
+                'There’s a fire! I need help.',
+                'Smoke detected, please send fire service.',
+                'Emergency: Fire hazard at my location.',
+            ],
+        },
+        {
+            label: 'Medical',
+            icon: 'medkit',
+            colorKey: 'success',
+            description: 'Call emergency medical responders for health crises.',
+            mapQuery: 'Hospital',
+            presetMessages: [
+                'Medical emergency! Please assist.',
+                'I need an ambulance immediately.',
+                'Health emergency, urgent care needed.',
+            ],
+        },
+    ];
 
     const toggle = (label) => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -137,27 +176,47 @@ const EmergencyShortcuts = ({ theme }) => {
             if (status !== 'granted') {
                 Alert.alert(
                     'Permission denied',
-                    'Location permission is required to share location.'
+                    'Location permission is required.'
                 );
                 return;
             }
-
-            const location = await Location.getCurrentPositionAsync({});
-            const message = `Emergency! My current location is: https://www.google.com/maps?q=${location.coords.latitude},${location.coords.longitude}`;
-
+            const loc = await Location.getCurrentPositionAsync({});
+            const message = `Emergency! My location: https://www.google.com/maps?q=${loc.coords.latitude},${loc.coords.longitude}`;
             sendSMS(number, message);
-        } catch (err) {
-            Alert.alert('Error', 'Unable to retrieve location.');
+        } catch {
+            Alert.alert('Error', 'Could not get your location.');
         }
     };
 
-    const handleAddContact = (contact) => {
-        setCustomContacts((prev) => [...prev, contact]);
+    const handleAddContact = async (contact) => {
+        try {
+            const formattedContact = {
+                user_id: parseInt(currentUserId, 10),
+                name: contact.name,
+                phone_number: contact.number,
+            };
+            await dispatch(addEmergencyContact(formattedContact)).unwrap();
+            dispatch(fetchEmergencyContacts(currentUserId));
+        } catch (err) {
+            Alert.alert('Error', err || 'Could not add contact');
+        }
+        setModalVisible(false);
     };
 
     const handleOpenSmsModal = (service) => {
         setSelectedService(service);
         setSmsModalVisible(true);
+    };
+
+    const handleRemoveContact = async () => {
+        try {
+            await dispatch(deleteEmergencyContact(selectedContact.id)).unwrap();
+            dispatch(fetchEmergencyContacts(currentUserId));
+        } catch (err) {
+            Alert.alert('Error', err || 'Could not delete contact');
+        }
+        setConfirmRemoveVisible(false);
+        setSelectedContact(null);
     };
 
     return (
@@ -293,10 +352,14 @@ const EmergencyShortcuts = ({ theme }) => {
                 </TouchableOpacity>
             ))}
 
-            {customContacts.map(({ name, number }, index) => (
+            {/* Custom Contacts */}
+            {contacts.map(({ id, name, phone_number }) => (
                 <TouchableOpacity
-                    key={`${name}-${index}`}
-                    activeOpacity={0.9}
+                    key={`${id}-${phone_number}`}
+                    onLongPress={() => {
+                        setSelectedContact({ id, name });
+                        setConfirmRemoveVisible(true);
+                    }}
                     style={[
                         styles.serviceCard,
                         {
@@ -316,14 +379,15 @@ const EmergencyShortcuts = ({ theme }) => {
                             {name}
                         </Text>
                         <TouchableOpacity
-                            onPress={() => Linking.openURL(`tel:${number}`)}
+                            onPress={() =>
+                                Linking.openURL(`tel:${phone_number}`)
+                            }
                         >
                             <Animated.View
                                 style={[
                                     styles.callBtn,
                                     {
-                                        backgroundColor:
-                                            theme.buttonSecondaryBackground,
+                                        backgroundColor: theme.success,
                                         transform: [{ scale: pulse }],
                                     },
                                 ]}
@@ -342,11 +406,25 @@ const EmergencyShortcuts = ({ theme }) => {
                             { color: theme.text, marginTop: 8 },
                         ]}
                     >
-                        {number}
+                        {phone_number}
                     </Text>
                 </TouchableOpacity>
             ))}
 
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                visible={confirmRemoveVisible}
+                onClose={() => setConfirmRemoveVisible(false)}
+                onConfirm={handleRemoveContact}
+                title={`Remove "${selectedContact?.name}"?`}
+                description='This contact will be removed from your emergency list.'
+                confirmLabel='Remove'
+                cancelLabel='Cancel'
+                theme={theme}
+                icon='trash'
+            />
+
+            {/* Add Contact */}
             <TouchableOpacity
                 onPress={() => setModalVisible(true)}
                 activeOpacity={0.8}
@@ -377,13 +455,33 @@ const EmergencyShortcuts = ({ theme }) => {
                 </Text>
             </TouchableOpacity>
 
-            <AddContactModal
+            {/* Modal with KeyboardAvoidingView */}
+            <Modal
                 visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                onAdd={handleAddContact}
-                theme={theme}
-            />
+                transparent
+                animationType='slide'
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                        style={{
+                            flex: 1,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <AddContactModal
+                            visible={modalVisible}
+                            onClose={() => setModalVisible(false)}
+                            onAdd={handleAddContact}
+                            theme={theme}
+                        />
+                    </KeyboardAvoidingView>
+                </TouchableWithoutFeedback>
+            </Modal>
 
+            {/* SMS Preset Modal */}
             <Modal
                 visible={smsModalVisible}
                 transparent
@@ -407,9 +505,9 @@ const EmergencyShortcuts = ({ theme }) => {
                             width: 280,
                         }}
                     >
-                        {selectedService?.presetMessages.map((msg, index) => (
+                        {selectedService?.presetMessages.map((msg) => (
                             <TouchableOpacity
-                                key={index}
+                                key={msg} // ✅ Updated for unique key warning
                                 style={{ paddingVertical: 10 }}
                                 onPress={() => {
                                     sendSMS(defaultNumber, msg);

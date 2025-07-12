@@ -7,8 +7,12 @@ import {
     StyleSheet,
     Alert,
     FlatList,
+    Keyboard,
+    TouchableWithoutFeedback,
+    Modal,
+    Platform,
+    KeyboardAvoidingView,
 } from 'react-native';
-import Modal from 'react-native-modal';
 import * as Contacts from 'expo-contacts';
 import { Feather } from '@expo/vector-icons';
 
@@ -17,14 +21,23 @@ const AddContactModal = ({ visible, onClose, onAdd, theme }) => {
     const [number, setNumber] = useState('');
     const [contacts, setContacts] = useState([]);
     const [showList, setShowList] = useState(false);
+    const [isValid, setIsValid] = useState(false);
 
     const styles = createStyles(theme);
 
     useEffect(() => {
         if (visible) {
             fetchContacts();
+        } else {
+            setName('');
+            setNumber('');
+            setShowList(false);
         }
     }, [visible]);
+
+    useEffect(() => {
+        validateInputs();
+    }, [name, number]);
 
     const fetchContacts = async () => {
         const { status } = await Contacts.requestPermissionsAsync();
@@ -46,6 +59,16 @@ const AddContactModal = ({ visible, onClose, onAdd, theme }) => {
         }
     };
 
+    const validateInputs = () => {
+        const trimmedName = name.trim();
+        const trimmedNumber = number.trim();
+
+        const isNameValid = trimmedName.length > 0 && trimmedName.length <= 30;
+        const isNumberValid = /^[\d+\-()\s]{7,15}$/.test(trimmedNumber);
+
+        setIsValid(isNameValid && isNumberValid);
+    };
+
     const handleAdd = () => {
         const trimmedName = name.trim();
         const trimmedNumber = number.trim();
@@ -55,15 +78,7 @@ const AddContactModal = ({ visible, onClose, onAdd, theme }) => {
             return;
         }
 
-        if (!/^[\d+\-()\s]{7,}$/.test(trimmedNumber)) {
-            Alert.alert('Invalid Number', 'Please enter a valid phone number.');
-            return;
-        }
-
         onAdd({ name: trimmedName, number: trimmedNumber });
-        setName('');
-        setNumber('');
-        setShowList(false);
         onClose();
     };
 
@@ -74,88 +89,135 @@ const AddContactModal = ({ visible, onClose, onAdd, theme }) => {
     };
 
     return (
-        <Modal
-            isVisible={visible}
-            onBackdropPress={onClose}
-            style={styles.modal}
-        >
-            <View style={styles.modalContent}>
-                <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                    <Feather name='x' size={20} color={theme.text} />
-                </TouchableOpacity>
-
-                <Text style={styles.title}>Add Emergency Contact</Text>
-
-                <TouchableOpacity
-                    style={styles.selectBtn}
-                    onPress={() => setShowList(!showList)}
+        <>
+            {visible && (
+                <Modal
+                    transparent
+                    animationType='slide'
+                    onRequestClose={onClose}
                 >
-                    <Text style={styles.selectBtnText}>
-                        {showList ? 'Hide Contact List' : 'Pick from Contacts'}
-                    </Text>
-                </TouchableOpacity>
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                        style={styles.overlay}
+                    >
+                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                            <View style={styles.modal}>
+                                <TouchableOpacity
+                                    style={styles.closeButton}
+                                    onPress={onClose}
+                                >
+                                    <Feather
+                                        name='x'
+                                        size={20}
+                                        color={theme.text}
+                                    />
+                                </TouchableOpacity>
 
-                {showList && (
-                    <FlatList
-                        data={contacts}
-                        keyExtractor={(item, index) =>
-                            `${item.number}-${index}`
-                        }
-                        renderItem={({ item }) => (
-                            <TouchableOpacity
-                                style={styles.contactItem}
-                                onPress={() => selectFromContact(item)}
-                            >
-                                <Text style={styles.contactName}>
-                                    {item.name}
+                                <Text style={styles.title}>
+                                    Add Emergency Contact
                                 </Text>
-                                <Text style={styles.contactNumber}>
-                                    {item.number}
-                                </Text>
-                            </TouchableOpacity>
-                        )}
-                        style={{ maxHeight: 250 }}
-                    />
-                )}
 
-                <TextInput
-                    placeholder='Name'
-                    placeholderTextColor={theme.placeholder}
-                    value={name}
-                    onChangeText={setName}
-                    style={styles.input}
-                />
+                                <TouchableOpacity
+                                    style={styles.selectBtn}
+                                    onPress={() => setShowList((prev) => !prev)}
+                                >
+                                    <Text style={styles.selectBtnText}>
+                                        {showList
+                                            ? 'Hide Contact List'
+                                            : 'Pick from Contacts'}
+                                    </Text>
+                                </TouchableOpacity>
 
-                <TextInput
-                    placeholder='Phone Number'
-                    placeholderTextColor={theme.placeholder}
-                    keyboardType='phone-pad'
-                    value={number}
-                    onChangeText={setNumber}
-                    style={styles.input}
-                />
+                                {showList && (
+                                    <FlatList
+                                        data={contacts}
+                                        keyExtractor={(item, index) =>
+                                            `${item.name}-${index}`
+                                        }
+                                        renderItem={({ item }) => (
+                                            <TouchableOpacity
+                                                style={styles.contactItem}
+                                                onPress={() =>
+                                                    selectFromContact(item)
+                                                }
+                                            >
+                                                <Text
+                                                    style={styles.contactName}
+                                                >
+                                                    {item.name}
+                                                </Text>
+                                                <Text
+                                                    style={styles.contactNumber}
+                                                >
+                                                    {item.number}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        )}
+                                        style={{ maxHeight: 250 }}
+                                        keyboardShouldPersistTaps='handled'
+                                    />
+                                )}
 
-                <TouchableOpacity style={styles.addButton} onPress={handleAdd}>
-                    <Text style={styles.addText}>Save Contact</Text>
-                </TouchableOpacity>
-            </View>
-        </Modal>
+                                <TextInput
+                                    placeholder='Name'
+                                    placeholderTextColor={theme.placeholder}
+                                    value={name}
+                                    onChangeText={(text) =>
+                                        setName(text.slice(0, 30))
+                                    }
+                                    style={styles.input}
+                                />
+
+                                <TextInput
+                                    placeholder='Phone Number'
+                                    placeholderTextColor={theme.placeholder}
+                                    keyboardType='phone-pad'
+                                    value={number}
+                                    onChangeText={(text) =>
+                                        setNumber(
+                                            text
+                                                .replace(/[^\d+\-()\s]/g, '')
+                                                .slice(0, 15)
+                                        )
+                                    }
+                                    style={styles.input}
+                                />
+
+                                <TouchableOpacity
+                                    style={[
+                                        styles.addButton,
+                                        {
+                                            opacity: isValid ? 1 : 0.5,
+                                        },
+                                    ]}
+                                    onPress={handleAdd}
+                                    disabled={!isValid}
+                                >
+                                    <Text style={styles.addText}>
+                                        Save Contact
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </KeyboardAvoidingView>
+                </Modal>
+            )}
+        </>
     );
 };
 
 const createStyles = (theme) =>
     StyleSheet.create({
-        modal: {
+        overlay: {
+            flex: 1,
             justifyContent: 'flex-end',
-            margin: 0,
+            backgroundColor: 'rgba(0,0,0,0.4)',
         },
-        modalContent: {
+        modal: {
             backgroundColor: theme.surface,
             padding: 20,
-            borderTopLeftRadius: 12,
-            borderTopRightRadius: 12,
-            position: 'relative',
-            maxHeight: '90%',
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
         },
         closeButton: {
             position: 'absolute',
