@@ -256,6 +256,7 @@ const TasksScreen = () => {
             <SwipeableList
                 ref={null}
                 data={paginated}
+                totalCount={filteredItems.length}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
                 hasMore={paginated.length < filteredItems.length}

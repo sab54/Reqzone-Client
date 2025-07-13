@@ -131,6 +131,7 @@ const DocumentsScreen = ({ theme }) => {
 
             <SwipeableList
                 data={filteredDocuments}
+                totalCount={filteredDocuments.length}
                 loading={loading}
                 hasMore={hasMore}
                 disableLoadMore={loading}
