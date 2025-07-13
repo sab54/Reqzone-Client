@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
     View,
     Text,
+    Image,
     StyleSheet,
     ActivityIndicator,
     FlatList,
@@ -245,7 +246,13 @@ const ChatScreen = () => {
             data={[{ key: 'placeholder' }]}
             keyExtractor={(item) => item.key}
             renderItem={() => (
-                <Text style={styles.emptyText}>No chats yet. Start one!</Text>
+                <View style={styles.emptyContainer}>
+                    <Image
+                        source={require('../../assets/no-chats2.png')}
+                        style={styles.emptyImage}
+                        resizeMode='contain'
+                    />
+                </View>
             )}
             contentContainerStyle={styles.scrollContent}
             refreshing={refreshing}
@@ -360,6 +367,22 @@ const createStyles = (theme, insets) =>
             fontSize: 16,
             fontFamily: 'Poppins',
             color: theme.text,
+        },
+        emptyContainer: {
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingVertical: 40,
+        },
+        emptyImage: {
+            width: 450,
+            height: 450,
+            opacity: 0.9,
+        },
+        scrollContent: {
+            flexGrow: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
         },
         fab: {
             position: 'absolute',
