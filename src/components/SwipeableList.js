@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useRef } from 'react';
 import {
     ActivityIndicator,
     Text,
@@ -37,6 +37,7 @@ const SwipeableList = forwardRef(
         },
         ref
     ) => {
+        const isSwipingRef = useRef(false);
         const scrollToBottom = () => {
             ref?.current?.scrollToEnd?.({ animated: true });
         };
@@ -82,7 +83,10 @@ const SwipeableList = forwardRef(
                         friction={1}
                         rightThreshold={20}
                         overshootRight={false}
-                        onSwipeableWillOpen={() => handleSwipeStart(index)}
+                        onSwipeableWillOpen={() => {
+                            isSwipingRef.current = true;
+                            handleSwipeStart(index);
+                        }}
                     >
                         {renderItemContainer ? (
                             renderItemContainer(item, content, onItemPress)
@@ -98,7 +102,14 @@ const SwipeableList = forwardRef(
                                     },
                                 ]}
                                 activeOpacity={0.8}
-                                onPress={() => onItemPress(item)}
+                                onPress={() => {
+                                    if (!isSwipingRef.current) {
+                                        onItemPress(item);
+                                    }
+                                    setTimeout(() => {
+                                        isSwipingRef.current = false;
+                                    }, 100);
+                                }}
                             >
                                 {content}
                             </TouchableOpacity>

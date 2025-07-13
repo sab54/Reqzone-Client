@@ -15,13 +15,14 @@ import weatherReducer from './reducers/weatherReducer';
 import alertsReducer from './reducers/alertsReducer';
 import chatReducer from './reducers/chatReducer';
 import gamificationReducer from './reducers/gamificationReducer';
+import documentsReducer from './reducers/documentsReducer';
 
 // 🎮 Game modules
 import quizzesReducer from './reducers/quizReducer';
 import tasksReducer from './reducers/tasksReducer';
 import badgesReducer from './reducers/badgesReducer';
 import dashboardReducer from './reducers/dashboardReducer';
-import leaderboardReducer from './reducers/leaderboardReducer'; // ✅ New
+import leaderboardReducer from './reducers/leaderboardReducer';
 
 // 🧠 Combine all feature slices
 const rootReducer = combineReducers({
@@ -37,6 +38,7 @@ const rootReducer = combineReducers({
     weather: weatherReducer,
     news: newsReducer,
     bookmarks: bookmarksReducer,
+    documents: documentsReducer, // ✅ Registered here
     alerts: alertsReducer,
     emergency: emergencyReducer,
     gamification: gamificationReducer,
@@ -46,7 +48,7 @@ const rootReducer = combineReducers({
     tasks: tasksReducer,
     badges: badgesReducer,
     dashboard: dashboardReducer,
-    leaderboard: leaderboardReducer, // ✅ Registered here
+    leaderboard: leaderboardReducer,
 });
 
 // 🏪 Configure the Redux store

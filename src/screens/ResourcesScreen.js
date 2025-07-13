@@ -3,14 +3,15 @@ import {
     View,
     Text,
     StyleSheet,
-    ScrollView,
     ActivityIndicator,
     RefreshControl,
+    FlatList,
 } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useFonts } from 'expo-font';
 
 import EmergencyShortcuts from '../module/EmergencyShortcuts';
+import DocumentsScreen from '../module/DocumentsScreen';
 import Footer from '../components/Footer';
 
 const ResourcesScreen = () => {
@@ -24,16 +25,13 @@ const ResourcesScreen = () => {
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-
-        // Simulate data re-fetching
         setTimeout(() => {
             setRefreshing(false);
         }, 1000);
     }, []);
 
     const styles = createStyles(theme);
-
-    const primaryColor = theme.primary || theme.info || '#0078D4'; // Fallback for missing primary
+    const primaryColor = theme.primary || theme.info || '#0078D4';
 
     if (!fontsLoaded) {
         return (
@@ -46,8 +44,14 @@ const ResourcesScreen = () => {
         );
     }
 
+    // Dummy data to enable FlatList (we only use the header/footer here)
+    const DATA = [{ key: 'content' }];
+
     return (
-        <ScrollView
+        <FlatList
+            data={DATA}
+            keyExtractor={(item) => item.key}
+            renderItem={null}
             style={[styles.container, { backgroundColor: theme.background }]}
             contentContainerStyle={styles.content}
             refreshControl={
@@ -58,13 +62,14 @@ const ResourcesScreen = () => {
                     tintColor={primaryColor}
                 />
             }
-        >
-            <Text style={styles.title}>📚 Emergency Resources</Text>
-
-            <EmergencyShortcuts theme={theme} />
-
-            <Footer theme={theme} />
-        </ScrollView>
+            ListHeaderComponent={
+                <>
+                    <EmergencyShortcuts theme={theme} />
+                    <DocumentsScreen theme={theme} />
+                </>
+            }
+            ListFooterComponent={<Footer theme={theme} />}
+        />
     );
 };
 
@@ -76,12 +81,6 @@ const createStyles = (theme) =>
         content: {
             padding: 20,
             paddingBottom: 100,
-        },
-        title: {
-            fontSize: 24,
-            fontFamily: 'PoppinsBold',
-            marginBottom: 20,
-            color: theme.primary || theme.info || '#0078D4', // fallback for title color
         },
         centered: {
             flex: 1,

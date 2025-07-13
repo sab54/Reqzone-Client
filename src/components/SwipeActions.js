@@ -2,12 +2,33 @@ import React from 'react';
 import { TouchableOpacity, Text, Animated, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
+/**
+ * props.actions should be an array of objects like:
+ * [
+ *   { type: 'open', label: 'Open\nDocument', icon: 'open-outline', color: '#3498db' },
+ *   { type: 'bookmark', label: 'Add\nBookmark', icon: 'bookmark-outline', color: '#27ae60' },
+ * ]
+ */
 const SwipeActions = ({
     dragX,
     article,
     index,
     isBookmarked,
     onAction,
+    actions = [
+        {
+            type: 'open',
+            label: 'Open\n',
+            icon: 'open-outline',
+            color: '#3498db',
+        },
+        {
+            type: 'bookmark',
+            label: 'Add\nBookmark',
+            icon: 'bookmark-outline',
+            color: '#27ae60',
+        },
+    ],
     theme = {},
 }) => {
     const translateX = dragX.interpolate({
@@ -22,6 +43,26 @@ const SwipeActions = ({
         extrapolate: 'clamp',
     });
 
+    const getActionStyle = (action) => {
+        if (action.type === 'bookmark') {
+            return {
+                backgroundColor: isBookmarked
+                    ? theme.error || '#e74c3c'
+                    : action.color || theme.success || '#27ae60',
+                icon: isBookmarked ? 'bookmark' : 'bookmark-outline',
+                label: isBookmarked
+                    ? 'Remove\nBookmark'
+                    : action.label || 'Add\nBookmark',
+            };
+        }
+
+        return {
+            backgroundColor: action.color || theme.primary || '#3498db',
+            icon: action.icon || 'help-outline',
+            label: action.label || 'Action',
+        };
+    };
+
     return (
         <Animated.View
             style={[
@@ -29,52 +70,33 @@ const SwipeActions = ({
                 { transform: [{ translateX }], opacity },
             ]}
         >
-            <TouchableOpacity
-                onPress={() => onAction('open', article, index)}
-                style={[
-                    styles.swipeContent,
-                    { backgroundColor: theme.primary || '#3498db' },
-                ]}
-            >
-                <Ionicons
-                    name='open-outline'
-                    size={22}
-                    color={theme.buttonPrimaryText || '#fff'}
-                />
-                <Text
-                    style={[
-                        styles.swipeText,
-                        { color: theme.buttonPrimaryText || '#fff' },
-                    ]}
-                >
-                    Open{'\n'}Article
-                </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => onAction('bookmark', article, index)}
-                style={[
-                    styles.swipeContent,
-                    {
-                        backgroundColor: isBookmarked
-                            ? theme.error || '#e74c3c'
-                            : theme.success || '#27ae60',
-                    },
-                ]}
-            >
-                <Ionicons
-                    name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
-                    size={22}
-                    color={theme.buttonPrimaryText || '#fff'}
-                />
-                <Text
-                    style={[
-                        styles.swipeText,
-                        { color: theme.buttonPrimaryText || '#fff' },
-                    ]}
-                >
-                    {isBookmarked ? 'Remove\nBookmark' : 'Add\nBookmark'}
-                </Text>
-            </TouchableOpacity>
+            {actions.map((action) => {
+                const { backgroundColor, icon, label } = getActionStyle(action);
+                return (
+                    <TouchableOpacity
+                        key={action.type}
+                        onPress={() => onAction(action.type, article, index)}
+                        style={[
+                            styles.swipeContent,
+                            { backgroundColor: backgroundColor },
+                        ]}
+                    >
+                        <Ionicons
+                            name={icon}
+                            size={22}
+                            color={theme.buttonPrimaryText || '#fff'}
+                        />
+                        <Text
+                            style={[
+                                styles.swipeText,
+                                { color: theme.buttonPrimaryText || '#fff' },
+                            ]}
+                        >
+                            {label}
+                        </Text>
+                    </TouchableOpacity>
+                );
+            })}
         </Animated.View>
     );
 };
