@@ -19,7 +19,6 @@ import {
 // Modules
 import WeatherCard from '../module/WeatherCard';
 import ProgressChart from '../module/ProgressChart';
-import EmergencyShortcuts from '../module/EmergencyShortcuts';
 import NewsAndBookmarks from '../module/NewsAndBookmarks';
 
 // Components
@@ -183,14 +182,6 @@ const HomeScreen = () => {
                         data={preparednessProgressData}
                         theme={theme}
                     />
-                </View>
-            ),
-        },
-        {
-            key: 'shortcuts',
-            render: () => (
-                <View style={styles.blockSpacing}>
-                    <EmergencyShortcuts theme={theme} />
                 </View>
             ),
         },
