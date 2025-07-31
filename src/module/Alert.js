@@ -56,7 +56,7 @@ const Alert = ({ theme }) => {
     } = useSelector((state) => state.alerts);
 
     const [selectedTab, setSelectedTab] = useState('alerts');
-    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedCategory, setSelectedCategory] = useState('System');
     const [searchQuery, setSearchQuery] = useState('');
     const [page, setPage] = useState(1);
     const [modalProps, setModalProps] = useState(null);
@@ -129,11 +129,9 @@ const Alert = ({ theme }) => {
     };
 
     const categories = [
-        { label: 'All', icon: 'apps-outline' },
-        { label: 'Emergency', icon: 'warning-outline' },
-        { label: 'Global', icon: 'globe-outline' },
-        { label: 'Weather', icon: 'cloud-outline' },
         { label: 'System', icon: 'tv-outline' },
+        { label: 'Emergency', icon: 'warning-outline' },
+        { label: 'Weather', icon: 'cloud-outline' },
     ];
 
     const filteredAlerts = (() => {
@@ -147,18 +145,26 @@ const Alert = ({ theme }) => {
             const normalizedType = alert.type?.toLowerCase() || '';
             const normalizedCategory = alert.category?.toLowerCase() || '';
 
-            const categoryMatch =
-                selectedCategory === 'All' ||
-                (selectedCategory === 'System' &&
-                    [
-                        'system',
-                        'maintenance',
-                        'update',
-                        'security',
-                        'general',
-                    ].includes(normalizedCategory)) ||
-                normalizedType === selectedCategory.toLowerCase() ||
-                normalizedCategory === selectedCategory.toLowerCase();
+            let categoryMatch = false;
+
+            if (selectedCategory === 'System') {
+                categoryMatch = [
+                    'system',
+                    'maintenance',
+                    'update',
+                    'security',
+                    'general',
+                ].includes(normalizedCategory);
+            } else if (selectedCategory === 'Weather') {
+                categoryMatch =
+                    normalizedType === 'weather' ||
+                    normalizedCategory === 'weather' ||
+                    alert.source === 'global'; // ✅ match global entries
+            } else if (selectedCategory === 'Emergency') {
+                categoryMatch =
+                    normalizedType === 'emergency' ||
+                    normalizedCategory === 'emergency';
+            }
 
             if (
                 alert.latitude &&
@@ -176,37 +182,31 @@ const Alert = ({ theme }) => {
             return titleMatch && categoryMatch;
         };
 
-        if (selectedCategory === 'Global') {
-            return hazardAlerts.filter(matchesFilters);
-        }
+        const mainData = alertsData.filter(matchesFilters);
+        const includeGlobal = selectedCategory === 'Weather';
+        const globalData = includeGlobal
+            ? hazardAlerts.filter(matchesFilters)
+            : [];
 
-        if (selectedCategory === 'All') {
-            return [...alertsData, ...hazardAlerts].filter(matchesFilters);
-        }
-
-        return alertsData.filter(matchesFilters);
+        return [...mainData, ...globalData];
     })();
 
     const alertsTabContent = () => (
         <SwipeableList
             data={filteredAlerts}
             loading={
-                selectedCategory === 'Global'
-                    ? hazardLoading
-                    : selectedCategory === 'All'
+                selectedCategory === 'Weather'
                     ? loading || hazardLoading
                     : loading
             }
             hasMore={
-                selectedCategory === 'All'
+                selectedCategory === 'Weather'
                     ? hasMore && !user
-                    : selectedCategory === 'Global'
-                    ? false
                     : hasMore && !user
             }
             totalCount={filteredAlerts.length}
             onLoadMore={
-                selectedCategory === 'Global' || user
+                selectedCategory === 'Weather' || user
                     ? undefined
                     : loadMoreAlerts
             }

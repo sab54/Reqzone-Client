@@ -65,7 +65,7 @@ export const fetchGlobalHazardAlerts = createAsyncThunk(
 
             const res = await fetch(feedUrl);
             const xml = await res.text();
-            const parsed = await parseXml(xml); // ✅ uses react-native-xml2js
+            const parsed = await parseXml(xml);
 
             console.log('Responce parsed: ', parsed);
 
@@ -75,7 +75,8 @@ export const fetchGlobalHazardAlerts = createAsyncThunk(
 
             const alerts = entriesArray
                 .map((entry) => normalizeAlertEntry(entry, countryCode))
-                .filter(Boolean);
+                .filter(Boolean)
+                .map((alert) => ({ ...alert, source: 'global' }));
 
             return {
                 alerts,
