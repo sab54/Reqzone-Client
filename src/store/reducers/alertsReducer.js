@@ -11,6 +11,13 @@ const initialState = {
         loading: false,
         error: null,
     },
+    globalHazards: {
+        data: [],
+        loading: false,
+        error: null,
+        country: null,
+        timestamp: null,
+    },
 };
 
 const alertsReducer = (state = initialState, action) => {
@@ -148,6 +155,39 @@ const alertsReducer = (state = initialState, action) => {
                 pendingActions: {
                     ...state.pendingActions,
                     data: [],
+                },
+            };
+
+        // Global Hazard Alerts
+        case 'alerts/fetchGlobalHazardAlerts/pending':
+            return {
+                ...state,
+                globalHazards: {
+                    ...state.globalHazards,
+                    loading: true,
+                    error: null,
+                },
+            };
+        case 'alerts/fetchGlobalHazardAlerts/fulfilled':
+            return {
+                ...state,
+                globalHazards: {
+                    loading: false,
+                    error: null,
+                    data: action.payload.alerts,
+                    country: action.payload.country,
+                    timestamp: action.payload.timestamp,
+                },
+            };
+        case 'alerts/fetchGlobalHazardAlerts/rejected':
+            return {
+                ...state,
+                globalHazards: {
+                    ...state.globalHazards,
+                    loading: false,
+                    error:
+                        action.payload ||
+                        'Failed to fetch global hazard alerts',
                 },
             };
 

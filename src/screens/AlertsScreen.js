@@ -111,7 +111,6 @@ const AlertScreen = () => {
 const createStyles = (theme, insets) =>
     StyleSheet.create({
         container: {
-            flex: 1,
             paddingTop: 20,
             paddingHorizontal: 16,
             paddingBottom: Platform.OS === 'ios' ? 20 : 10 + insets.bottom,

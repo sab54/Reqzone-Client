@@ -5,6 +5,7 @@ import {
     TouchableOpacity,
     Linking,
     StyleSheet,
+    ActivityIndicator,
 } from 'react-native';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +23,7 @@ import {
     fetchUserAlerts,
     loadPendingActions,
     markAlertAsRead,
+    fetchGlobalHazardAlerts,
 } from '../store/actions/alertsActions';
 
 import { formatTimeAgo, truncate } from '../utils/utils';
@@ -46,6 +48,11 @@ const Alert = ({ theme }) => {
     const {
         alerts: { data: alertsData = [], loading, hasMore },
         pendingActions = [],
+        globalHazards: {
+            data: hazardAlerts = [],
+            loading: hazardLoading,
+            error: hazardError,
+        },
     } = useSelector((state) => state.alerts);
 
     const [selectedTab, setSelectedTab] = useState('alerts');
@@ -60,6 +67,7 @@ const Alert = ({ theme }) => {
 
     useEffect(() => {
         dispatch(loadPendingActions());
+        dispatch(fetchGlobalHazardAlerts());
         (async () => {
             const { status } =
                 await Location.requestForegroundPermissionsAsync();
@@ -122,45 +130,86 @@ const Alert = ({ theme }) => {
 
     const categories = [
         { label: 'All', icon: 'apps-outline' },
+        { label: 'Emergency', icon: 'warning-outline' },
+        { label: 'Global', icon: 'globe-outline' },
         { label: 'Weather', icon: 'cloud-outline' },
         { label: 'System', icon: 'tv-outline' },
-        { label: 'Emergency', icon: 'warning-outline' },
     ];
 
-    const filteredAlerts = alertsData.filter((alert) => {
-        const titleMatch = alert.title
-            ?.toLowerCase()
-            .includes(searchQuery.toLowerCase());
-        const categoryMatch =
-            selectedCategory === 'All' ||
-            (selectedCategory === 'System' &&
-                ['maintenance', 'update', 'security', 'general'].includes(
-                    alert.category?.toLowerCase()
-                )) ||
-            alert.type?.toLowerCase() === selectedCategory.toLowerCase() ||
-            alert.category?.toLowerCase() === selectedCategory.toLowerCase();
-        if (
-            alert.latitude &&
-            alert.longitude &&
-            alert.radius_km &&
-            userLocation
-        ) {
-            const distance = haversineDistance(userLocation, {
-                latitude: parseFloat(alert.latitude),
-                longitude: parseFloat(alert.longitude),
-            });
-            if (distance > parseFloat(alert.radius_km)) return false;
+    const filteredAlerts = (() => {
+        const normalizedSearch = searchQuery.toLowerCase();
+
+        const matchesFilters = (alert) => {
+            const titleMatch = alert.title
+                ?.toLowerCase()
+                .includes(normalizedSearch);
+
+            const normalizedType = alert.type?.toLowerCase() || '';
+            const normalizedCategory = alert.category?.toLowerCase() || '';
+
+            const categoryMatch =
+                selectedCategory === 'All' ||
+                (selectedCategory === 'System' &&
+                    [
+                        'system',
+                        'maintenance',
+                        'update',
+                        'security',
+                        'general',
+                    ].includes(normalizedCategory)) ||
+                normalizedType === selectedCategory.toLowerCase() ||
+                normalizedCategory === selectedCategory.toLowerCase();
+
+            if (
+                alert.latitude &&
+                alert.longitude &&
+                alert.radius_km &&
+                userLocation
+            ) {
+                const distance = haversineDistance(userLocation, {
+                    latitude: parseFloat(alert.latitude),
+                    longitude: parseFloat(alert.longitude),
+                });
+                if (distance > parseFloat(alert.radius_km)) return false;
+            }
+
+            return titleMatch && categoryMatch;
+        };
+
+        if (selectedCategory === 'Global') {
+            return hazardAlerts.filter(matchesFilters);
         }
-        return titleMatch && categoryMatch;
-    });
+
+        if (selectedCategory === 'All') {
+            return [...alertsData, ...hazardAlerts].filter(matchesFilters);
+        }
+
+        return alertsData.filter(matchesFilters);
+    })();
 
     const alertsTabContent = () => (
         <SwipeableList
             data={filteredAlerts}
-            loading={loading}
-            hasMore={hasMore && !user}
+            loading={
+                selectedCategory === 'Global'
+                    ? hazardLoading
+                    : selectedCategory === 'All'
+                    ? loading || hazardLoading
+                    : loading
+            }
+            hasMore={
+                selectedCategory === 'All'
+                    ? hasMore && !user
+                    : selectedCategory === 'Global'
+                    ? false
+                    : hasMore && !user
+            }
             totalCount={filteredAlerts.length}
-            onLoadMore={!user ? loadMoreAlerts : undefined}
+            onLoadMore={
+                selectedCategory === 'Global' || user
+                    ? undefined
+                    : loadMoreAlerts
+            }
             theme={theme}
             swipeableRefs={swipeableRefs}
             handleSwipeStart={handleSwipeStart}

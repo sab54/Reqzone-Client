@@ -3,8 +3,94 @@ import { get, post, patch, del } from '../../utils/api';
 import { API_URL_ALERTS } from '../../utils/apiPaths';
 import { DEV_MODE } from '../../utils/config';
 import { mockAlerts } from '../../data/mockData';
+import { parseString } from 'react-native-xml2js';
+import { getUserLocation, reverseGeocode } from '../../utils/utils';
 
-// 📌 Fetch User Alerts from /alerts/user/:userId
+const REGION_FEEDS = {
+    US: 'https://alerts.weather.gov/cap/us.php?x=0',
+    GB: 'https://www.metoffice.gov.uk/public/data/PWSCache/WarningsRSS/Region/UK.xml',
+    // Add more countries as needed
+};
+
+const normalizeAlertEntry = (entry, country) => {
+    if (country === 'US') {
+        return {
+            title: entry.title,
+            summary: entry.summary,
+            area: entry['cap:areaDesc'],
+            severity: entry['cap:severity'],
+            event: entry['cap:event'],
+            effective: entry['cap:effective'],
+            expires: entry['cap:expires'],
+            link: entry.link?.href || entry.id,
+            country,
+        };
+    } else if (country === 'GB') {
+        return {
+            title: entry.title,
+            summary: entry.description,
+            area: entry['georss:point'],
+            severity: entry['cap:severity'] || 'Unknown',
+            event: entry.category?._ || 'Weather Warning',
+            effective: entry['cap:effective'],
+            expires: entry['cap:expires'],
+            link: entry.link,
+            country,
+        };
+    }
+    return null;
+};
+
+const parseXml = (xml) =>
+    new Promise((resolve, reject) => {
+        parseString(xml, { explicitArray: false }, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
+
+export const fetchGlobalHazardAlerts = createAsyncThunk(
+    'alerts/fetchGlobalHazardAlerts',
+    async (_, { rejectWithValue }) => {
+        try {
+            const { latitude, longitude } = await getUserLocation();
+            const { countryCode } = await reverseGeocode(latitude, longitude);
+
+            const feedUrl = REGION_FEEDS[countryCode];
+
+            console.log('feedUrl: ', feedUrl, countryCode);
+            if (!feedUrl) {
+                throw new Error(`No feed available for ${countryCode}`);
+            }
+
+            const res = await fetch(feedUrl);
+            const xml = await res.text();
+            const parsed = await parseXml(xml); // ✅ uses react-native-xml2js
+
+            console.log('Responce parsed: ', parsed);
+
+            const entries =
+                parsed?.feed?.entry || parsed?.rss?.channel?.item || [];
+            const entriesArray = Array.isArray(entries) ? entries : [entries];
+
+            const alerts = entriesArray
+                .map((entry) => normalizeAlertEntry(entry, countryCode))
+                .filter(Boolean);
+
+            return {
+                alerts,
+                country: countryCode,
+                count: alerts.length,
+                timestamp: new Date().toISOString(),
+            };
+        } catch (error) {
+            return rejectWithValue(
+                error.message || 'Failed to fetch global hazard alerts'
+            );
+        }
+    }
+);
+
 export const fetchUserAlerts = createAsyncThunk(
     'alerts/fetchUserAlerts',
     async (userId, { rejectWithValue }) => {

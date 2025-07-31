@@ -1,5 +1,9 @@
+import axios from 'axios';
 import * as Location from 'expo-location';
 
+import { OPENCAGE_API_KEY } from './config';
+
+// 📌 Get User's Coordinates via Expo Location API
 export const getUserLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
 
@@ -12,6 +16,23 @@ export const getUserLocation = async () => {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
     };
+};
+
+// 📌 Reverse Geocode to Get Country Code from Coordinates
+export const reverseGeocode = async (lat, lon) => {
+    try {
+        const res = await axios.get(
+            `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${OPENCAGE_API_KEY}`
+        );
+
+        const countryCode =
+            res.data?.results?.[0]?.components?.country_code?.toUpperCase() ||
+            'US';
+        return { countryCode };
+    } catch (error) {
+        console.error('Reverse geocoding failed:', error);
+        return { countryCode: 'US' }; // default fallback
+    }
 };
 
 export const formatTimeAgo = (dateString) => {
