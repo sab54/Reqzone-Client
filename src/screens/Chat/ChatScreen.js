@@ -191,25 +191,25 @@ const ChatScreen = () => {
                     let address = `Lat: ${latitude.toFixed(
                         5
                     )}, Lon: ${longitude.toFixed(5)}`;
-
+                    var hasAddress = false;
                     try {
                         const data = await Location.reverseGeocodeAsync({
                             latitude,
                             longitude,
                         });
                         if (data?.[0]) {
-                            address = [
-                                data[0].name,
-                                data[0].city,
-                                data[0].postalCode,
-                            ]
-                                .filter(Boolean)
-                                .join(', ');
+                            address = data[0];
+                            hasAddress = true;
                         }
                     } catch (_) {}
 
                     const result = await dispatch(
-                        joinLocalGroup({ latitude, longitude, address })
+                        joinLocalGroup({
+                            latitude,
+                            longitude,
+                            address,
+                            hasAddress,
+                        })
                     );
 
                     if (result?.payload?.chat_id) {

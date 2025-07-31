@@ -27,11 +27,11 @@ export const reverseGeocode = async (lat, lon) => {
 
         const countryCode =
             res.data?.results?.[0]?.components?.country_code?.toUpperCase() ||
-            'US';
+            'GB';
         return { countryCode };
     } catch (error) {
         console.error('Reverse geocoding failed:', error);
-        return { countryCode: 'US' }; // default fallback
+        return { countryCode: 'GB' }; // default fallback
     }
 };
 

@@ -1353,3 +1353,151 @@ export const mockAlerts = {
     hasMore: true,
     totalCount: 5,
 };
+
+export const mockOPENCAGE = {
+    documentation: 'https://opencagedata.com/api',
+    licenses: [
+        {
+            name: 'see attribution guide',
+            url: 'https://opencagedata.com/credits',
+        },
+    ],
+    rate: {
+        limit: 2500,
+        remaining: 2454,
+        reset: 1754006400,
+    },
+    results: [
+        {
+            annotations: {
+                DMS: {
+                    lat: "52° 33' 45.02808'' N",
+                    lng: "0° 15' 51.07752'' E",
+                },
+                MGRS: '30UXD8543327121',
+                Maidenhead: 'IO92un85ha',
+                Mercator: {
+                    x: -29409.297,
+                    y: 6868529.686,
+                },
+                OSM: {
+                    edit_url:
+                        'https://www.openstreetmap.org/edit?way=4497674#map=17/52.56251/-0.26419',
+                    note_url:
+                        'https://www.openstreetmap.org/note/new#map=17/52.56251/-0.26419&layers=N',
+                    url: 'https://www.openstreetmap.org/?mlat=52.56251&mlon=-0.26419#map=17/52.56251/-0.26419',
+                },
+                UN_M49: {
+                    regions: {
+                        EUROPE: '150',
+                        GB: '826',
+                        NORTHERN_EUROPE: '154',
+                        WORLD: '001',
+                    },
+                    statistical_groupings: ['MEDC'],
+                },
+                callingcode: 44,
+                currency: {
+                    alternate_symbols: [],
+                    decimal_mark: '.',
+                    html_entity: '&#x00A3;',
+                    iso_code: 'GBP',
+                    iso_numeric: '826',
+                    name: 'British Pound',
+                    smallest_denomination: 1,
+                    subunit: 'Penny',
+                    subunit_to_unit: 100,
+                    symbol: '£',
+                    symbol_first: 1,
+                    thousands_separator: ',',
+                },
+                flag: '🇬🇧',
+                geohash: 'gcrg1bxwgcwurg1dgjum',
+                qibla: 119.81,
+                roadinfo: {
+                    drive_on: 'left',
+                    road: 'Daymond Street',
+                    road_type: 'residential',
+                    speed_in: 'mph',
+                },
+                sun: {
+                    rise: {
+                        apparent: 1753935660,
+                        astronomical: 1753924200,
+                        civil: 1753933080,
+                        nautical: 1753929600,
+                    },
+                    set: {
+                        apparent: 1753991580,
+                        astronomical: 1754002800,
+                        civil: 1753994100,
+                        nautical: 1753997580,
+                    },
+                },
+                timezone: {
+                    name: 'Europe/London',
+                    now_in_dst: 1,
+                    offset_sec: 3600,
+                    offset_string: '+0100',
+                    short_name: 'BST',
+                },
+                what3words: {
+                    words: 'reduce.wipe.wasp',
+                },
+            },
+            bounds: {
+                northeast: {
+                    lat: 52.5625771,
+                    lng: -0.2639025,
+                },
+                southwest: {
+                    lat: 52.5618478,
+                    lng: -0.2645687,
+                },
+            },
+            components: {
+                'ISO_3166-1_alpha-2': 'GB',
+                'ISO_3166-1_alpha-3': 'GBR',
+                'ISO_3166-2': ['GB-ENG', 'GB-PTE'],
+                _category: 'road',
+                _normalized_city: 'Peterborough',
+                _type: 'road',
+                city: 'Peterborough',
+                continent: 'Europe',
+                country: 'United Kingdom',
+                country_code: 'gb',
+                county: 'City of Peterborough',
+                postcode: 'PE2 9RW',
+                road: 'Daymond Street',
+                road_type: 'residential',
+                state: 'England',
+                state_code: 'ENG',
+                state_district: 'Cambridgeshire and Peterborough',
+                suburb: 'Woodston',
+            },
+            confidence: 9,
+            distance_from_q: {
+                meters: 4,
+            },
+            formatted: 'Daymond Street, Peterborough, PE2 9RW, United Kingdom',
+            geometry: {
+                lat: 52.5625078,
+                lng: -0.2641882,
+            },
+        },
+    ],
+    status: {
+        code: 200,
+        message: 'OK',
+    },
+    stay_informed: {
+        blog: 'https://blog.opencagedata.com',
+        mastodon: 'https://en.osm.town/@opencage',
+    },
+    thanks: 'For using an OpenCage API',
+    timestamp: {
+        created_http: 'Thu, 31 Jul 2025 11:31:43 GMT',
+        created_unix: 1753961503,
+    },
+    total_results: 1,
+};

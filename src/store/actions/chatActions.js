@@ -190,14 +190,20 @@ export const removeUserFromGroup = createAsyncThunk(
 export const joinLocalGroup = createAsyncThunk(
     'chat/joinLocalGroup',
     async (
-        { latitude, longitude, address },
+        { latitude, longitude, address, hasAddress },
         { getState, dispatch, rejectWithValue }
     ) => {
         try {
             const userId = getState().auth?.user?.id;
             if (!userId) throw new Error('User not authenticated');
 
-            const payload = { userId, latitude, longitude, address };
+            const payload = {
+                userId,
+                latitude,
+                longitude,
+                address,
+                hasAddress,
+            };
             const response = await post(
                 `${API_URL_CHAT}/local-groups/join`,
                 payload
