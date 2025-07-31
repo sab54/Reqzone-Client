@@ -1,5 +1,3 @@
-// /src/context/ChatContext.js
-
 import React, { createContext, useState } from 'react';
 import uuid from 'react-native-uuid';
 

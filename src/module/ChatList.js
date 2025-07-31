@@ -1,11 +1,4 @@
-import React, {
-    useRef,
-    useState,
-    useMemo,
-    useImperativeHandle,
-    forwardRef,
-    useEffect,
-} from 'react';
+import React, { useRef, useState, useMemo, useEffect, forwardRef } from 'react';
 import {
     View,
     Text,
@@ -56,7 +49,6 @@ const ChatList = forwardRef(
             { key: 'private', label: '👤 Private' },
         ];
 
-        // 📌 Filter & paginate chats, but DO NOT re-sort (order is passed in from parent)
         const filteredChats = useMemo(() => {
             const byType = chats.filter((chat) => {
                 if (selectedTab === 'groups') return chat.is_group;
@@ -70,7 +62,7 @@ const ChatList = forwardRef(
                     .includes(searchQuery.trim().toLowerCase())
             );
 
-            return bySearch; // ✅ Maintain order passed from parent (ChatScreen)
+            return bySearch;
         }, [chats, selectedTab, searchQuery]);
 
         const paginatedChats = filteredChats.slice(0, page * PAGE_SIZE);
@@ -220,56 +212,7 @@ const ChatList = forwardRef(
                     onItemPress={(chat) =>
                         navigation.navigate('ChatRoom', { chatId: chat.id })
                     }
-                    renderItemText={(chat) => {
-                        const chatId = chat.id;
-                        const hasUnread = unreadByChatId[chatId];
-
-                        return (
-                            <View style={styles.row}>
-                                {renderAvatar(chat)}
-                                <View style={{ flex: 1 }}>
-                                    <Text
-                                        style={[
-                                            styles.chatTitle,
-                                            { color: theme.title },
-                                        ]}
-                                        numberOfLines={1}
-                                    >
-                                        {truncate(chat.name || 'Unknown', 30)}
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            styles.lastMessage,
-                                            { color: theme.text, opacity: 0.7 },
-                                        ]}
-                                        numberOfLines={1}
-                                    >
-                                        {truncate(
-                                            chat.lastMessage ||
-                                                'Start chatting!',
-                                            50
-                                        )}
-                                    </Text>
-                                </View>
-
-                                <View style={styles.metaRight}>
-                                    <Text
-                                        style={[
-                                            styles.timeAgo,
-                                            { color: theme.text, opacity: 0.5 },
-                                        ]}
-                                    >
-                                        {formatTimeAgo(
-                                            chat.updated_at || chat.created_at
-                                        )}
-                                    </Text>
-                                    {hasUnread && (
-                                        <View style={styles.unreadDot} />
-                                    )}
-                                </View>
-                            </View>
-                        );
-                    }}
+                    renderItemText={() => 'Chat item'} // ✅ Required, but placeholder
                     renderRightActions={(chat) => (
                         <View style={styles.swipeActionsWrapper}>
                             <TouchableOpacity
@@ -284,21 +227,77 @@ const ChatList = forwardRef(
                             </TouchableOpacity>
                         </View>
                     )}
-                    renderItemContainer={(chat, content, onItemPress) => (
-                        <Pressable
-                            onPress={() => onItemPress(chat)}
-                            style={({ pressed }) => [
-                                styles.chatItem,
-                                {
-                                    backgroundColor: pressed
-                                        ? theme.cardPressed
-                                        : theme.surface,
-                                },
-                            ]}
-                        >
-                            {content}
-                        </Pressable>
-                    )}
+                    renderItemContainer={(chat, _text, onItemPress) => {
+                        const chatId = chat.id;
+                        const hasUnread = unreadByChatId[chatId];
+                        return (
+                            <Pressable
+                                onPress={() => onItemPress(chat)}
+                                style={({ pressed }) => [
+                                    styles.chatItem,
+                                    {
+                                        backgroundColor: pressed
+                                            ? theme.cardPressed
+                                            : theme.surface,
+                                    },
+                                ]}
+                            >
+                                <View style={styles.row}>
+                                    {renderAvatar(chat)}
+                                    <View style={{ flex: 1 }}>
+                                        <Text
+                                            style={[
+                                                styles.chatTitle,
+                                                { color: theme.title },
+                                            ]}
+                                            numberOfLines={1}
+                                        >
+                                            {truncate(
+                                                chat.name || 'Unknown',
+                                                30
+                                            )}
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.lastMessage,
+                                                {
+                                                    color: theme.text,
+                                                    opacity: 0.7,
+                                                },
+                                            ]}
+                                            numberOfLines={1}
+                                        >
+                                            {truncate(
+                                                chat.lastMessage ||
+                                                    'Start chatting!',
+                                                50
+                                            )}
+                                        </Text>
+                                    </View>
+
+                                    <View style={styles.metaRight}>
+                                        <Text
+                                            style={[
+                                                styles.timeAgo,
+                                                {
+                                                    color: theme.text,
+                                                    opacity: 0.5,
+                                                },
+                                            ]}
+                                        >
+                                            {formatTimeAgo(
+                                                chat.updated_at ||
+                                                    chat.created_at
+                                            )}
+                                        </Text>
+                                        {hasUnread && (
+                                            <View style={styles.unreadDot} />
+                                        )}
+                                    </View>
+                                </View>
+                            </Pressable>
+                        );
+                    }}
                 />
 
                 {modalProps && (

@@ -60,21 +60,18 @@ const ChatScreen = () => {
 
     const styles = createStyles(theme, insets);
 
-    // 📌 Fetch chats (pull-to-refresh)
     const fetchChats = useCallback(() => {
         if (refreshing) return;
         setRefreshing(true);
         dispatch(fetchActiveChats()).finally(() => setRefreshing(false));
     }, [dispatch, refreshing]);
 
-    // 📌 On screen focus
     useFocusEffect(
         useCallback(() => {
             dispatch(fetchActiveChats());
         }, [dispatch])
     );
 
-    // 📌 Setup socket events
     useEffect(() => {
         if (!currentUserId) return;
 
@@ -100,14 +97,12 @@ const ChatScreen = () => {
         };
     }, [currentUserId, dispatch]);
 
-    // 📌 Scroll to top when new chats arrive
     useEffect(() => {
         if (flatListRef.current && activeChats.length > 0) {
             flatListRef.current.scrollToOffset({ offset: 0, animated: true });
         }
     }, [activeChats.length]);
 
-    // 📌 Get user current location
     useEffect(() => {
         (async () => {
             const { status } =
@@ -119,7 +114,6 @@ const ChatScreen = () => {
         })();
     }, []);
 
-    // 📌 Haversine distance calculation
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
         const R = 6371;
         const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -132,7 +126,6 @@ const ChatScreen = () => {
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     };
 
-    // 📌 Prioritize local group on top
     const sortedChats = [...activeChats].sort((a, b) => {
         const aIsLocal =
             a.is_group &&
@@ -165,7 +158,6 @@ const ChatScreen = () => {
         return new Date(b.updated_at) - new Date(a.updated_at);
     });
 
-    // 📌 Handle FAB Modal Selections
     const handleSelection = async (action) => {
         setActionModalVisible(false);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -191,7 +183,7 @@ const ChatScreen = () => {
                     let address = `Lat: ${latitude.toFixed(
                         5
                     )}, Lon: ${longitude.toFixed(5)}`;
-                    var hasAddress = false;
+                    let hasAddress = false;
                     try {
                         const data = await Location.reverseGeocodeAsync({
                             latitude,
@@ -223,12 +215,10 @@ const ChatScreen = () => {
                 break;
             case 'start_ai_chat':
                 console.log('AI Chat');
-
                 break;
         }
     };
 
-    // 📌 Unread message check
     const unreadByChatId = {};
     activeChats.forEach((chat) => {
         const chatId = chat.chat_id || chat.id;
@@ -240,7 +230,6 @@ const ChatScreen = () => {
         );
     });
 
-    // 📌 Empty state
     const renderEmptyList = () => (
         <FlatList
             data={[{ key: 'placeholder' }]}
@@ -252,6 +241,9 @@ const ChatScreen = () => {
                         style={styles.emptyImage}
                         resizeMode='contain'
                     />
+                    <Text style={styles.emptyText}>
+                        No chats yet. Start one!
+                    </Text>
                 </View>
             )}
             contentContainerStyle={styles.scrollContent}
@@ -349,8 +341,9 @@ const createStyles = (theme, insets) =>
             paddingBottom: Platform.OS === 'ios' ? 20 : 10 + insets.bottom,
         },
         scrollContent: {
-            paddingTop: 20,
-            paddingHorizontal: 16,
+            flexGrow: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
         },
         loadingContainer: {
             flex: 1,
@@ -360,13 +353,6 @@ const createStyles = (theme, insets) =>
         loadingText: {
             marginTop: 10,
             fontFamily: 'Poppins',
-        },
-        emptyText: {
-            textAlign: 'center',
-            marginTop: 40,
-            fontSize: 16,
-            fontFamily: 'Poppins',
-            color: theme.text,
         },
         emptyContainer: {
             flex: 1,
@@ -379,10 +365,12 @@ const createStyles = (theme, insets) =>
             height: 450,
             opacity: 0.9,
         },
-        scrollContent: {
-            flexGrow: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
+        emptyText: {
+            textAlign: 'center',
+            marginTop: -90,
+            fontSize: 16,
+            fontFamily: 'Poppins',
+            color: theme.text,
         },
         fab: {
             position: 'absolute',

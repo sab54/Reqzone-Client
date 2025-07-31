@@ -61,7 +61,6 @@ export const startDirectMessage = createAsyncThunk(
         try {
             const state = getState();
             const currentUserId = state.auth?.user?.id;
-            const users = state.chat?.allUsers || [];
 
             if (!currentUserId || !otherUserId) {
                 throw new Error('User IDs are required');
@@ -75,15 +74,12 @@ export const startDirectMessage = createAsyncThunk(
 
             const response = await post(`${API_URL_CHAT}/create`, payload);
 
-            const user = users.find((u) => u.id === otherUserId);
-            const name = user
-                ? `${user.first_name} ${user.last_name}`.trim()
-                : 'Direct Chat';
-
             return {
-                chat_id: response.chat_id,
+                chat_id: response?.chat?.id,
                 is_group: false,
-                name,
+                name: response?.chat?.name || 'Direct Chat',
+                members: response?.chat?.members || [],
+                chat: response?.chat,
                 ...response,
             };
         } catch (error) {
@@ -114,9 +110,11 @@ export const createGroupChat = createAsyncThunk(
             const response = await post(`${API_URL_CHAT}/create`, payload);
 
             return {
-                chat_id: response.chat_id,
+                chat_id: response?.chat?.id,
                 is_group: true,
-                name,
+                name: response?.chat?.name || name,
+                members: response?.chat?.members || [],
+                chat: response?.chat,
                 ...response,
             };
         } catch (error) {

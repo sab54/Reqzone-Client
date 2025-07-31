@@ -91,6 +91,7 @@ const ChatRoomScreen = () => {
             (c) => c.id === chatId || c.chat_id === chatId
         )
     );
+
     const messages = useSelector(selectMessagesByChatId(chatId));
     const lastReadMessageId = useSelector(
         (state) => state.chat.lastReadByChatId[chatId]
@@ -436,6 +437,11 @@ const ChatRoomScreen = () => {
                             />
                         ) : messages.length === 0 ? (
                             <View style={styles.centered}>
+                                <Image
+                                    source={require('../../assets/no-chats2.png')}
+                                    style={styles.emptyImage}
+                                    resizeMode='contain'
+                                />
                                 <Text style={styles.noMessageText}>
                                     No messages yet. Say hello!
                                 </Text>
@@ -493,12 +499,14 @@ const ChatRoomScreen = () => {
                             chatId={chatId}
                             theme={themeColors}
                         />
-                        <GroupInfoModal
-                            visible={groupInfoVisible}
-                            onClose={() => setGroupInfoVisible(false)}
-                            chat={chat}
-                            theme={themeColors}
-                        />
+                        {chat && (
+                            <GroupInfoModal
+                                visible={groupInfoVisible}
+                                onClose={() => setGroupInfoVisible(false)}
+                                chat={chat}
+                                theme={themeColors}
+                            />
+                        )}
                         <ActionModal
                             visible={actionModalVisible}
                             onClose={() => setActionModalVisible(false)}
@@ -625,10 +633,23 @@ const createStyles = (theme, insets) =>
             justifyContent: 'center',
             alignItems: 'center',
         },
-        centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+        centered: {
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingVertical: 40,
+        },
+
+        emptyImage: {
+            width: 450,
+            height: 450,
+            opacity: 0.9,
+        },
         noMessageText: {
+            textAlign: 'center',
+            marginTop: -90,
+            fontSize: 16,
             fontFamily: 'Poppins',
-            fontSize: 15,
             color: theme.text,
         },
         errorText: {

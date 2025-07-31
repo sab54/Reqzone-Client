@@ -61,7 +61,22 @@ const SwipeableList = forwardRef(
                         />
                     )}
                     <View style={styles.textWrapper}>
-                        {renderItemText(item)}
+                        {(() => {
+                            const result = renderItemText(item);
+                            if (typeof result === 'string') {
+                                return (
+                                    <Text
+                                        style={{ color: theme.text || '#000' }}
+                                    >
+                                        {result}
+                                    </Text>
+                                );
+                            }
+                            if (React.isValidElement(result)) {
+                                return result;
+                            }
+                            return null;
+                        })()}
                     </View>
                 </>
             );

@@ -39,7 +39,7 @@ let searchDebounceTimeout;
 const AddPeopleScreen = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
-    const route = useRoute(); // ✅ Access route params
+    const route = useRoute();
     const insets = useSafeAreaInsets();
     const { themeColors } = useSelector((state) => state.theme);
     const { allUsers, draftGroupUsers, loading } = useSelector(
@@ -47,7 +47,8 @@ const AddPeopleScreen = () => {
     );
 
     const styles = createStyles(themeColors, insets);
-    const { chatId } = route.params || {}; // ✅ Get chatId if passed
+    const { chatId, mode } = route.params || {};
+    console.log(' AddPeopleScreen route params chatId: ', chatId);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [submitting, setSubmitting] = useState(false);
@@ -59,20 +60,16 @@ const AddPeopleScreen = () => {
         PoppinsBold: require('../../assets/fonts/Poppins-Bold.ttf'),
     });
 
-    // Initial load
     useEffect(() => {
         dispatch(fetchUserSuggestions(''));
         dispatch(clearDraftGroupUsers());
     }, [dispatch]);
 
-    // Debounced search effect
     useEffect(() => {
         if (searchDebounceTimeout) clearTimeout(searchDebounceTimeout);
-
         searchDebounceTimeout = setTimeout(() => {
             dispatch(fetchUserSuggestions(searchQuery));
         }, 300);
-
         return () => clearTimeout(searchDebounceTimeout);
     }, [searchQuery, dispatch]);
 
@@ -126,8 +123,7 @@ const AddPeopleScreen = () => {
         try {
             const userIds = draftGroupUsers.map((u) => u.id);
 
-            // ✅ If chatId exists, we’re adding users to an existing group
-            if (chatId) {
+            if (chatId && mode === 'addToGroup') {
                 await dispatch(
                     addUserToExistingGroup({ chatId, userIds })
                 ).unwrap();

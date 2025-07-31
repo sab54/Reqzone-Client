@@ -15,10 +15,12 @@ import { Feather } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { removeUserFromGroup } from '../store/actions/chatActions'; // ✅ adjust path if needed
-import ConfirmationModal from '../components/ConfirmationModal'; // ✅ import your reusable modal
+import { removeUserFromGroup } from '../store/actions/chatActions';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
+    console.log('GroupInfoModal chat: ', chat);
+
     const insets = useSafeAreaInsets();
     const keyboardOffset = Platform.OS === 'ios' ? insets.top : 0;
 
@@ -32,9 +34,17 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
     if (!chat) return null;
 
     const isGroup = chat.is_group;
-    const participants = chat.members || chat.participants || [];
     const creatorId = chat.created_by || null;
     const styles = createStyles(theme, insets);
+
+    // ✅ Normalize participants
+    const participants = (chat.members || []).map((m) => ({
+        id: m.id || m.user_id,
+        name: m.name || `${m.first_name || ''} ${m.last_name || ''}`.trim(),
+        email: m.email,
+        avatar: m.avatar,
+        role: m.role || 'member',
+    }));
 
     const isOwner =
         participants.find((m) => m.id === currentUserId)?.role === 'owner';
@@ -75,7 +85,7 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                 <View style={{ flex: 1 }}>
                     <View style={styles.nameRow}>
                         <Text style={styles.memberName}>
-                            {item.name || 'Unnamed'}
+                            {item.name || item.email || 'Unnamed'}
                         </Text>
                         {isSelf && <Text style={styles.badge}>You</Text>}
                         {isCreator && <Text style={styles.badge}>Creator</Text>}
@@ -86,8 +96,8 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                     )}
                 </View>
 
-                {/* Optional remove button */}
-                {!isSelf && !isAdmin && isOwner && (
+                {/* ✅ Only show remove button in group chats */}
+                {isGroup && !isSelf && !isAdmin && isOwner && (
                     <TouchableOpacity
                         style={styles.removeButton}
                         onPress={() => {
@@ -113,7 +123,6 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                 propagateSwipe
             >
                 <SafeAreaView style={styles.modalContent}>
-                    {/* Close Button */}
                     <TouchableOpacity
                         style={styles.closeButton}
                         onPress={onClose}
@@ -132,7 +141,9 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
 
                     <FlatList
                         data={sortedParticipants}
-                        keyExtractor={(item) => item.id.toString()}
+                        keyExtractor={(item, index) =>
+                            item?.id?.toString?.() || `member-${index}`
+                        }
                         renderItem={renderUser}
                         contentContainerStyle={styles.listContent}
                     />
@@ -143,7 +154,11 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                             onPress={() => {
                                 onClose();
                                 navigation.navigate('AddPeopleScreen', {
-                                    chatId: chat.id,
+                                    mode: 'addToGroup',
+                                    chatId: chat.chat_id ?? chat.id,
+                                    existingMembers: participants.map(
+                                        (p) => p.id
+                                    ),
                                 });
                             }}
                         >
@@ -155,7 +170,6 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                 </SafeAreaView>
             </Modal>
 
-            {/* 📌 Confirmation Modal */}
             <ConfirmationModal
                 visible={showConfirm}
                 onClose={() => setShowConfirm(false)}
@@ -163,7 +177,7 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                     if (selectedUser) {
                         await dispatch(
                             removeUserFromGroup({
-                                chatId: chat.id,
+                                chatId: chat.chat_id ?? chat.id,
                                 userId: selectedUser.id,
                             })
                         );
@@ -195,7 +209,7 @@ const createStyles = (theme, insets) => {
             borderTopLeftRadius: 16,
             borderTopRightRadius: 16,
             padding: 20,
-            paddingBottom: 120, // Ensures content doesn't overlap with button
+            paddingBottom: 120,
             flexGrow: 1,
         },
         closeButton: {
@@ -219,7 +233,7 @@ const createStyles = (theme, insets) => {
             marginBottom: 12,
         },
         listContent: {
-            paddingBottom: 140, // Prevent FlatList overlap with button
+            paddingBottom: 140,
         },
         memberItem: {
             flexDirection: 'row',
