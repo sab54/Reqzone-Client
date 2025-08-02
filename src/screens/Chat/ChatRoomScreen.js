@@ -46,7 +46,7 @@ import {
     markChatAsReadThunk,
     queuePendingMessage,
     flushQueuedMessages,
-    fetchChatById, // ✅ NEW
+    fetchChatById,
 } from '../../store/actions/chatActions';
 import {
     appendMessage,
@@ -84,8 +84,9 @@ const ChatRoomScreen = () => {
     const [isAtBottom, setIsAtBottom] = useState(true);
     const [isTyping, setIsTyping] = useState(false);
     const [actionModalVisible, setActionModalVisible] = useState(false);
-    const [location, setLocation] = useState(null);
     const [quizPromptVisible, setQuizPromptVisible] = useState(false);
+    const [pendingQuizModal, setPendingQuizModal] = useState(false);
+    const [location, setLocation] = useState(null);
 
     const chat = useSelector((state) =>
         state.chat.activeChats.find(
@@ -153,7 +154,6 @@ const ChatRoomScreen = () => {
         return () => showSub.remove?.();
     }, [chatId, dispatch]);
 
-    // ✅ Auto refresh chat (members etc.) when opening or groupInfo changes
     useEffect(() => {
         if (chatId) {
             dispatch(fetchChatById(chatId));
@@ -264,7 +264,7 @@ const ChatRoomScreen = () => {
         if (!senderId || !chatId) return;
 
         if (messageType === 'quiz') {
-            setQuizPromptVisible(true);
+            setPendingQuizModal(true); // defer modal
             return;
         }
 
@@ -513,6 +513,12 @@ const ChatRoomScreen = () => {
                         <ActionModal
                             visible={actionModalVisible}
                             onClose={() => setActionModalVisible(false)}
+                            onModalHide={() => {
+                                if (pendingQuizModal) {
+                                    setPendingQuizModal(false);
+                                    setQuizPromptVisible(true);
+                                }
+                            }}
                             onSelect={handlePreparedMessage}
                             theme={themeColors}
                             options={[
@@ -552,7 +558,6 @@ const ChatRoomScreen = () => {
                                 },
                             ]}
                         />
-
                         <QuizPromptModal
                             visible={quizPromptVisible}
                             onClose={() => setQuizPromptVisible(false)}

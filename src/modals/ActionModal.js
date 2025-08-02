@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
 import { Feather } from '@expo/vector-icons';
 
@@ -10,6 +10,7 @@ const ActionModal = ({
     theme,
     options,
     loadingMessage = 'Loading...',
+    onModalHide,
 }) => {
     const [loading, setLoading] = useState(false);
     const styles = createStyles(theme);
@@ -23,7 +24,9 @@ const ActionModal = ({
         <Modal
             isVisible={visible}
             onBackdropPress={onClose}
+            onModalHide={onModalHide}
             style={styles.modal}
+            backdropTransitionOutTiming={0}
         >
             <View style={styles.modalContent}>
                 {/* Close Button */}
@@ -34,7 +37,7 @@ const ActionModal = ({
                 {/* Modal Title */}
                 <Text style={styles.modalTitle}>Choose an Option</Text>
 
-                {/* Loading Message */}
+                {/* Loading or Options */}
                 {loading ? (
                     <Text style={styles.loadingText}>{loadingMessage}</Text>
                 ) : (

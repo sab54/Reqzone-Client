@@ -32,6 +32,7 @@ const QuizPromptModal = ({ visible, onClose, onCreate, theme }) => {
         <Modal
             isVisible={visible}
             onBackdropPress={onClose}
+            avoidKeyboard={true}
             style={styles.modal}
         >
             <View style={styles.modalContent}>
@@ -141,8 +142,8 @@ const createStyles = (theme) =>
             backgroundColor: theme.input,
         },
         diffButtonSelected: {
-            backgroundColor: theme.primary,
-            borderColor: theme.primary,
+            backgroundColor: theme.buttonPrimaryBackground,
+            borderColor: theme.buttonPrimaryBackground,
         },
         diffText: {
             color: theme.text,
@@ -150,7 +151,7 @@ const createStyles = (theme) =>
             fontSize: 13,
         },
         diffTextSelected: {
-            color: theme.buttonPrimaryText,
+            color: theme.buttonPrimaryText || '#ffffff',
             fontFamily: 'PoppinsBold',
         },
         createButton: {
