@@ -119,58 +119,60 @@ const ChatList = forwardRef(
         };
 
         const renderAvatar = (chat) => {
-            const initials = (chat.name || 'U')
-                .split(' ')
-                .map((w) => w.charAt(0).toUpperCase())
-                .slice(0, 2)
-                .join('');
+            const backgroundColor = stringToColor(chat.name || 'U');
 
-            const backgroundColor = chat.is_group
-                ? 'mediumseagreen'
-                : stringToColor(chat.name || 'U');
-
-            return (
-                <View
-                    style={{
-                        width: 42,
-                        height: 42,
-                        borderRadius: 21,
-                        backgroundColor,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginRight: 12,
-                        position: 'relative',
-                    }}
-                >
-                    <Text
+            if (chat.is_group) {
+                return (
+                    <View
                         style={{
-                            color: theme.surface,
-                            fontWeight: '600',
-                            fontSize: 16,
-                            fontFamily: 'Poppins',
+                            width: 42,
+                            height: 42,
+                            borderRadius: 21,
+                            backgroundColor,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginRight: 12,
                         }}
                     >
-                        {initials}
-                    </Text>
-
-                    {chat.is_group && (
                         <Ionicons
                             name='people'
-                            size={14}
+                            size={24}
                             color={theme.surface}
-                            style={{
-                                position: 'absolute',
-                                bottom: -4,
-                                right: -4,
-                                backgroundColor: theme.background,
-                                borderRadius: 8,
-                                padding: 2,
-                                elevation: 2,
-                            }}
                         />
-                    )}
-                </View>
-            );
+                    </View>
+                );
+            } else {
+                const initials = (chat.name || 'U')
+                    .split(' ')
+                    .map((w) => w.charAt(0).toUpperCase())
+                    .slice(0, 2)
+                    .join('');
+
+                return (
+                    <View
+                        style={{
+                            width: 42,
+                            height: 42,
+                            borderRadius: 21,
+                            backgroundColor,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginRight: 12,
+                        }}
+                    >
+                        <Text
+                            style={{
+                                color: theme.surface,
+                                fontWeight: '600',
+                                fontSize: 16,
+                                fontFamily: 'Poppins',
+                            }}
+                        >
+                            {initials}
+                        </Text>
+                    </View>
+                );
+            }
         };
 
         return (

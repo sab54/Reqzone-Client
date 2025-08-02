@@ -18,7 +18,6 @@ import {
 
 // Modules
 import WeatherCard from '../module/WeatherCard';
-import ProgressChart from '../module/ProgressChart';
 import NewsAndBookmarks from '../module/NewsAndBookmarks';
 
 // Components
@@ -171,17 +170,6 @@ const HomeScreen = () => {
             render: () => (
                 <View style={styles.blockSpacing}>
                     <NewsAndBookmarks theme={theme} />
-                </View>
-            ),
-        },
-        {
-            key: 'chart',
-            render: () => (
-                <View style={styles.blockSpacing}>
-                    <ProgressChart
-                        data={preparednessProgressData}
-                        theme={theme}
-                    />
                 </View>
             ),
         },
