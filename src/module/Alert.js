@@ -1,29 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    Text,
     View,
+    Text,
     TouchableOpacity,
     Linking,
     StyleSheet,
-    ActivityIndicator,
 } from 'react-native';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { Card } from 'react-native-paper';
 
 import Tabs from '../components/Tabs';
-import HorizontalSelector from '../components/HorizontalSelector';
 import SwipeableList from '../components/SwipeableList';
 import SearchBar from '../components/SearchBar';
-import ConfirmationModal from '../components/ConfirmationModal';
 
 import {
     fetchAlertsData,
     fetchUserAlerts,
-    loadPendingActions,
-    markAlertAsRead,
     fetchGlobalHazardAlerts,
+    markAlertAsRead,
 } from '../store/actions/alertsActions';
 
 import { formatTimeAgo, truncate } from '../utils/utils';
@@ -47,52 +42,44 @@ const Alert = ({ theme }) => {
     const { user } = useSelector((state) => state.auth);
     const {
         alerts: { data: alertsData = [], loading, hasMore },
-        pendingActions = [],
-        globalHazards: {
-            data: hazardAlerts = [],
-            loading: hazardLoading,
-            error: hazardError,
-        },
+        globalHazards: { data: hazardAlerts = [], loading: hazardLoading },
     } = useSelector((state) => state.alerts);
 
-    const [selectedTab, setSelectedTab] = useState('alerts');
     const [selectedCategory, setSelectedCategory] = useState('System');
     const [searchQuery, setSearchQuery] = useState('');
     const [page, setPage] = useState(1);
-    const [modalProps, setModalProps] = useState(null);
     const [userLocation, setUserLocation] = useState(null);
 
     const swipeableRefs = useRef({});
     const currentlyOpenSwipeable = useRef(null);
 
     useEffect(() => {
-        dispatch(loadPendingActions());
         dispatch(fetchGlobalHazardAlerts());
         (async () => {
             const { status } =
                 await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                console.warn('Location permission denied');
-                return;
+            if (status === 'granted') {
+                const location = await Location.getCurrentPositionAsync({});
+                setUserLocation(location.coords);
             }
-            const location = await Location.getCurrentPositionAsync({});
-            setUserLocation(location.coords);
         })();
     }, [dispatch]);
 
     useEffect(() => {
-        if (selectedTab === 'alerts') {
-            setPage(1);
-            if (user) dispatch(fetchUserAlerts(user.id));
-            dispatch(
-                fetchAlertsData({
-                    category: selectedCategory,
-                    page: 1,
-                    userId: user?.id,
-                })
-            );
-        }
-    }, [dispatch, selectedCategory, selectedTab, user]);
+        fetchAlerts(1);
+    }, [selectedCategory]);
+
+    const fetchAlerts = async (pageNumber = 1) => {
+        if (user) await dispatch(fetchUserAlerts(user.id));
+        await dispatch(
+            fetchAlertsData({
+                category: selectedCategory,
+                page: pageNumber,
+                userId: user?.id,
+            })
+        );
+        setPage(pageNumber);
+    };
 
     const loadMoreAlerts = () => {
         if (loading || !hasMore) return;
@@ -128,10 +115,10 @@ const Alert = ({ theme }) => {
         currentlyOpenSwipeable.current = swipeableRefs.current[index];
     };
 
-    const categories = [
-        { label: 'System', icon: 'tv-outline' },
-        { label: 'Emergency', icon: 'warning-outline' },
-        { label: 'Weather', icon: 'cloud-outline' },
+    const tabs = [
+        { key: 'System', label: '🛠 System' },
+        { key: 'Emergency', label: '🚨 Emergency' },
+        { key: 'Weather', label: '⛅ Weather' },
     ];
 
     const filteredAlerts = (() => {
@@ -159,7 +146,7 @@ const Alert = ({ theme }) => {
                 categoryMatch =
                     normalizedType === 'weather' ||
                     normalizedCategory === 'weather' ||
-                    alert.source === 'global'; // ✅ match global entries
+                    alert.source === 'global';
             } else if (selectedCategory === 'Emergency') {
                 categoryMatch =
                     normalizedType === 'emergency' ||
@@ -183,236 +170,163 @@ const Alert = ({ theme }) => {
         };
 
         const mainData = alertsData.filter(matchesFilters);
-        const includeGlobal = selectedCategory === 'Weather';
-        const globalData = includeGlobal
-            ? hazardAlerts.filter(matchesFilters)
-            : [];
+        const globalData =
+            selectedCategory === 'Weather'
+                ? hazardAlerts.filter(matchesFilters)
+                : [];
 
         return [...mainData, ...globalData];
     })();
 
-    const alertsTabContent = () => (
-        <SwipeableList
-            data={filteredAlerts}
-            loading={
-                selectedCategory === 'Weather'
-                    ? loading || hazardLoading
-                    : loading
-            }
-            hasMore={
-                selectedCategory === 'Weather'
-                    ? hasMore && !user
-                    : hasMore && !user
-            }
-            totalCount={filteredAlerts.length}
-            onLoadMore={
-                selectedCategory === 'Weather' || user
-                    ? undefined
-                    : loadMoreAlerts
-            }
-            theme={theme}
-            swipeableRefs={swipeableRefs}
-            handleSwipeStart={handleSwipeStart}
-            keyExtractor={(item, index) =>
-                `${item.id ?? index}-${item.type ?? item.category ?? 'alert'}`
-            }
-            icon='notifications-outline'
-            renderItemText={(alert) => (
-                <View>
-                    <Text
-                        style={[styles.alertTitle, { color: theme.title }]}
-                        numberOfLines={2}
-                    >
-                        {!alert.is_read && (
-                            <Ionicons
-                                name='ellipse'
-                                size={8}
-                                color={theme.info || 'blue'}
-                                style={{ marginLeft: 4 }}
-                            />
-                        )}{' '}
-                        {truncate(alert.title)}
-                    </Text>
-                    {alert.message && (
-                        <Text
-                            style={[styles.summary, { color: theme.text }]}
-                            numberOfLines={2}
-                        >
-                            {truncate(alert.message)}
-                        </Text>
-                    )}
-                    <View style={styles.row}>
-                        <Text
-                            style={[
-                                styles.time,
-                                { color: theme.text, opacity: 0.6 },
-                            ]}
-                        >
-                            {formatTimeAgo(alert.created_at || alert.timestamp)}
-                        </Text>
-                    </View>
-                </View>
-            )}
-            renderRightActions={(alert, index) => (
-                <TouchableOpacity
-                    style={{
-                        backgroundColor: alert.is_read
-                            ? theme.error
-                            : theme.success,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        width: 80,
-                        height: '90%',
-                        borderRadius: 12,
-                        marginVertical: 4,
-                    }}
-                    onPress={() => handleAction('markRead', alert, index)}
-                >
-                    <Ionicons
-                        name={
-                            alert.is_read
-                                ? 'close-circle-outline'
-                                : 'checkmark-done-outline'
-                        }
-                        size={24}
-                        color='#fff'
-                    />
-                </TouchableOpacity>
-            )}
-            onItemPress={(alert) => alert.url && Linking.openURL(alert.url)}
-            ListHeaderComponent={
-                <>
-                    <SearchBar
-                        query={searchQuery}
-                        onChange={setSearchQuery}
-                        theme={theme}
-                        placeholder='Search alerts...'
-                        debounceTime={300}
-                    />
-                    <HorizontalSelector
-                        data={categories}
-                        selected={categories.find(
-                            (item) => item.label === selectedCategory
-                        )}
-                        onSelect={(item) => setSelectedCategory(item.label)}
-                        theme={theme}
-                        isEqual={(a, b) => a.label === b.label}
-                        renderIcon={(item, isSelected) => (
-                            <Ionicons
-                                name={item.icon}
-                                size={16}
-                                color={
-                                    isSelected
-                                        ? theme.buttonPrimaryText
-                                        : theme.text
-                                }
-                            />
-                        )}
-                        itemKey={(item) => item.label}
-                    />
-                </>
-            }
-        />
-    );
-
-    const pendingActionsTabContent = () => (
-        <SwipeableList
-            data={pendingActions}
-            loading={false}
-            hasMore={false}
-            totalCount={pendingActions.length}
-            theme={theme}
-            swipeableRefs={swipeableRefs}
-            handleSwipeStart={handleSwipeStart}
-            keyExtractor={(item, index) => `${item.id ?? index}-pending`}
-            icon='time-outline'
-            renderItemText={(action) => (
-                <View>
-                    <Text
-                        style={[styles.alertTitle, { color: theme.title }]}
-                        numberOfLines={2}
-                    >
-                        {truncate(action.title)}
-                    </Text>
-                    {action.description && (
-                        <Text
-                            style={[styles.summary, { color: theme.text }]}
-                            numberOfLines={2}
-                        >
-                            {truncate(action.description)}
-                        </Text>
-                    )}
-                </View>
-            )}
-        />
-    );
-
-    const tabs = [
-        { key: 'alerts', label: '🔔 Alerts', content: alertsTabContent },
-        {
-            key: 'pendingActions',
-            label: '⏳ Pending Actions',
-            content: pendingActionsTabContent,
-        },
-    ];
+    const styles = createStyles(theme);
 
     return (
-        <Card
-            style={[
-                styles.card,
-                {
-                    backgroundColor: theme.card,
-                    borderColor: theme.border,
-                    shadowColor: theme.shadow,
-                },
-            ]}
-        >
+        <View style={styles.container}>
+            <SearchBar
+                query={searchQuery}
+                onChange={setSearchQuery}
+                theme={theme}
+                placeholder='Search alerts...'
+                debounceTime={300}
+            />
+
             <Tabs
                 tabs={tabs}
-                selectedTab={selectedTab}
-                onTabSelect={setSelectedTab}
+                selectedTab={selectedCategory}
+                onTabSelect={(tabKey) => setSelectedCategory(tabKey)}
                 theme={theme}
             />
-            {tabs.find((t) => t.key === selectedTab)?.content()}
-            {modalProps && (
-                <ConfirmationModal
-                    visible={modalProps.visible}
-                    theme={theme}
-                    onClose={() => setModalProps(null)}
-                    onConfirm={modalProps.onConfirm}
-                    onCancel={modalProps.onCancel}
-                    title={modalProps.title}
-                    description={modalProps.description}
-                    icon={modalProps.icon}
-                    confirmLabel={modalProps.confirmLabel}
-                    cancelLabel={modalProps.cancelLabel}
-                />
-            )}
-        </Card>
+
+            <SwipeableList
+                data={filteredAlerts}
+                loading={
+                    selectedCategory === 'Weather'
+                        ? loading || hazardLoading
+                        : loading
+                }
+                hasMore={hasMore}
+                onLoadMore={loadMoreAlerts}
+                refreshing={false} // Disable pull-to-refresh
+                onRefresh={() => {}} // No-op
+                totalCount={filteredAlerts.length}
+                theme={theme}
+                swipeableRefs={swipeableRefs}
+                handleSwipeStart={handleSwipeStart}
+                keyExtractor={(item, index) =>
+                    `${item.id ?? index}-${
+                        item.type ?? item.category ?? 'alert'
+                    }`
+                }
+                icon='notifications-outline'
+                renderItemText={(alert) => (
+                    <View>
+                        <Text
+                            style={[styles.alertTitle, { color: theme.title }]}
+                            numberOfLines={2}
+                        >
+                            {!alert.is_read && (
+                                <Ionicons
+                                    name='ellipse'
+                                    size={8}
+                                    color={theme.info || 'blue'}
+                                    style={{ marginLeft: 4 }}
+                                />
+                            )}{' '}
+                            {truncate(alert.title)}
+                        </Text>
+                        {alert.message && (
+                            <Text
+                                style={[styles.summary, { color: theme.text }]}
+                                numberOfLines={2}
+                            >
+                                {truncate(alert.message)}
+                            </Text>
+                        )}
+                        <View style={styles.row}>
+                            <Text
+                                style={[
+                                    styles.time,
+                                    { color: theme.text, opacity: 0.6 },
+                                ]}
+                            >
+                                {formatTimeAgo(
+                                    alert.created_at || alert.timestamp
+                                )}
+                            </Text>
+                        </View>
+                    </View>
+                )}
+                renderRightActions={(alert, index) => (
+                    <TouchableOpacity
+                        style={{
+                            backgroundColor: alert.is_read
+                                ? theme.error
+                                : theme.success,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: 80,
+                            height: '90%',
+                            borderRadius: 12,
+                            marginVertical: 4,
+                        }}
+                        onPress={() => handleAction('markRead', alert, index)}
+                    >
+                        <Ionicons
+                            name={
+                                alert.is_read
+                                    ? 'close-circle-outline'
+                                    : 'checkmark-done-outline'
+                            }
+                            size={24}
+                            color='#fff'
+                        />
+                    </TouchableOpacity>
+                )}
+                onItemPress={(alert) => alert.url && Linking.openURL(alert.url)}
+                ListEmptyComponent={
+                    !loading && (
+                        <Text
+                            style={{
+                                textAlign: 'center',
+                                marginTop: 40,
+                                color: theme.mutedText,
+                            }}
+                        >
+                            No alerts found.
+                        </Text>
+                    )
+                }
+            />
+        </View>
     );
 };
 
-const styles = StyleSheet.create({
-    card: {
-        marginBottom: 20,
-        borderRadius: 12,
-        padding: 15,
-        elevation: 4,
-        borderWidth: 1,
-    },
-    alertTitle: {
-        fontSize: 14,
-        fontFamily: 'Poppins',
-        fontWeight: 'bold',
-        marginBottom: 4,
-    },
-    summary: { fontSize: 13, fontFamily: 'Poppins', marginBottom: 4 },
-    time: { fontSize: 12, fontFamily: 'Poppins' },
-    row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-});
+const createStyles = (theme) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.background,
+        },
+        alertTitle: {
+            fontSize: 14,
+            fontFamily: 'Poppins',
+            fontWeight: 'bold',
+            marginBottom: 4,
+        },
+        summary: {
+            fontSize: 13,
+            fontFamily: 'Poppins',
+            marginBottom: 4,
+        },
+        time: {
+            fontSize: 12,
+            fontFamily: 'Poppins',
+        },
+        row: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+        },
+    });
 
 export default Alert;

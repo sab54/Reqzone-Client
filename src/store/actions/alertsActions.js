@@ -9,35 +9,46 @@ import { getUserLocation, reverseGeocode } from '../../utils/utils';
 const REGION_FEEDS = {
     US: 'https://alerts.weather.gov/cap/us.php?x=0',
     GB: 'https://www.metoffice.gov.uk/public/data/PWSCache/WarningsRSS/Region/UK.xml',
-    // Add more countries as needed
 };
 
 const normalizeAlertEntry = (entry, country) => {
-    if (country === 'US') {
-        return {
-            title: entry.title,
-            summary: entry.summary,
-            area: entry['cap:areaDesc'],
-            severity: entry['cap:severity'],
-            event: entry['cap:event'],
-            effective: entry['cap:effective'],
-            expires: entry['cap:expires'],
-            link: entry.link?.href || entry.id,
-            country,
-        };
-    } else if (country === 'GB') {
-        return {
-            title: entry.title,
-            summary: entry.description,
-            area: entry['georss:point'],
-            severity: entry['cap:severity'] || 'Unknown',
-            event: entry.category?._ || 'Weather Warning',
-            effective: entry['cap:effective'],
-            expires: entry['cap:expires'],
-            link: entry.link,
-            country,
-        };
+    try {
+        if (country === 'US') {
+            return {
+                title: entry.title?._ || entry.title || 'Untitled Alert',
+                summary: entry.summary?._ || entry.summary || '',
+                area: entry['cap:areaDesc'] || '',
+                severity: entry['cap:severity'] || 'Unknown',
+                event: entry['cap:event'] || 'Weather Alert',
+                effective: new Date(
+                    entry['cap:effective'] || entry.updated || null
+                )?.toISOString(),
+                expires: new Date(
+                    entry['cap:expires'] || entry['cap:expires'] || null
+                )?.toISOString(),
+                link: entry.link?.href || entry.id || '',
+                country,
+            };
+        }
+
+        if (country === 'GB') {
+            return {
+                title: entry.title || 'Untitled Alert',
+                summary: entry.description || '',
+                area: entry['georss:point'] || '',
+                severity: entry['cap:severity'] || 'Unknown',
+                event: entry.category?._ || entry.category || 'Weather Warning',
+                effective: null, // GB feed lacks standard date fields
+                expires: null,
+                link: entry.link || '',
+                country,
+            };
+        }
+    } catch (err) {
+        console.warn('normalizeAlertEntry failed:', err);
+        return null;
     }
+
     return null;
 };
 
@@ -67,8 +78,6 @@ export const fetchGlobalHazardAlerts = createAsyncThunk(
             const xml = await res.text();
             const parsed = await parseXml(xml);
 
-            console.log('Responce parsed: ', parsed);
-
             const entries =
                 parsed?.feed?.entry || parsed?.rss?.channel?.item || [];
             const entriesArray = Array.isArray(entries) ? entries : [entries];
@@ -78,6 +87,8 @@ export const fetchGlobalHazardAlerts = createAsyncThunk(
                 .filter(Boolean)
                 .map((alert) => ({ ...alert, source: 'global' }));
 
+            console.log(`Fetched ${alerts.length} global alerts`);
+
             return {
                 alerts,
                 country: countryCode,
@@ -85,6 +96,7 @@ export const fetchGlobalHazardAlerts = createAsyncThunk(
                 timestamp: new Date().toISOString(),
             };
         } catch (error) {
+            console.error('Global alert fetch error:', error);
             return rejectWithValue(
                 error.message || 'Failed to fetch global hazard alerts'
             );

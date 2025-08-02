@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import {
     View,
     Text,
@@ -24,20 +24,11 @@ const AlertScreen = () => {
     const dispatch = useDispatch();
     const theme = useSelector((state) => state.theme.themeColors);
     const { error } = useSelector((state) => state.weather);
-    const insets = useSafeAreaInsets(); // Safe area inset for padding
-
-    const [refreshing, setRefreshing] = useState(false);
+    const insets = useSafeAreaInsets();
 
     const [fontsLoaded] = useFonts({
         Poppins: require('../assets/fonts/Poppins-Regular.ttf'),
     });
-
-    const onRefresh = useCallback(() => {
-        setRefreshing(true);
-        Promise.all([dispatch(fetchWeatherData())]).finally(() => {
-            setTimeout(() => setRefreshing(false), 1000);
-        });
-    }, [dispatch]);
 
     useEffect(() => {
         dispatch(fetchWeatherData());
@@ -102,8 +93,6 @@ const AlertScreen = () => {
                 { backgroundColor: theme.background },
             ]}
             showsVerticalScrollIndicator={false}
-            refreshing={refreshing}
-            onRefresh={onRefresh}
         />
     );
 };
@@ -124,21 +113,6 @@ const createStyles = (theme, insets) =>
         },
         loadingText: {
             marginTop: 10,
-            fontFamily: 'Poppins',
-        },
-        headerWrapper: {
-            alignItems: 'center',
-            marginBottom: 24,
-        },
-        headerText: {
-            fontSize: 26,
-            fontWeight: '700',
-            fontFamily: 'Poppins',
-        },
-        subtitle: {
-            fontSize: 14,
-            marginTop: 6,
-            opacity: 0.7,
             fontFamily: 'Poppins',
         },
         blockSpacing: {

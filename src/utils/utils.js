@@ -25,13 +25,29 @@ export const reverseGeocode = async (lat, lon) => {
             `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${OPENCAGE_API_KEY}`
         );
 
-        const countryCode =
-            res.data?.results?.[0]?.components?.country_code?.toUpperCase() ||
-            'GB';
-        return { countryCode };
+        const components = res.data?.results?.[0]?.components || {};
+
+        const countryCode = components.country_code?.toUpperCase() || 'GB';
+        const region =
+            components.region ||
+            components.state ||
+            components.county ||
+            components.city ||
+            '';
+
+        console.log('reverseGeocode components: ', components);
+
+        return {
+            countryCode,
+            region,
+            ...components,
+        };
     } catch (error) {
         console.error('Reverse geocoding failed:', error);
-        return { countryCode: 'GB' }; // default fallback
+        return {
+            countryCode: 'GB',
+            region: 'England',
+        };
     }
 };
 
