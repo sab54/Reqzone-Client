@@ -19,8 +19,6 @@ import { removeUserFromGroup } from '../store/actions/chatActions';
 import ConfirmationModal from '../components/ConfirmationModal';
 
 const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
-    console.log('GroupInfoModal chat: ', chat);
-
     const insets = useSafeAreaInsets();
     const keyboardOffset = Platform.OS === 'ios' ? insets.top : 0;
 

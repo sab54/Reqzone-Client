@@ -48,7 +48,6 @@ const AddPeopleScreen = () => {
 
     const styles = createStyles(themeColors, insets);
     const { chatId, mode } = route.params || {};
-    console.log(' AddPeopleScreen route params chatId: ', chatId);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [submitting, setSubmitting] = useState(false);

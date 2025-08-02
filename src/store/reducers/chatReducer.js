@@ -11,7 +11,8 @@ import {
     removeUserFromDraftGroup,
     clearDraftGroupUsers,
     markChatAsReadThunk,
-    removeUserFromGroup, // ✅ NEW
+    removeUserFromGroup,
+    fetchChatById, // ✅ ADDED
 } from '../actions/chatActions';
 
 const initialState = {
@@ -245,7 +246,6 @@ const chatSlice = createSlice({
                 state.draftGroupUsers = [];
             })
 
-            // ✅ Handle user removal from group
             .addCase(removeUserFromGroup.fulfilled, (state, action) => {
                 const { chatId, userId } = action.payload;
                 const chat = state.activeChats.find(
@@ -253,6 +253,23 @@ const chatSlice = createSlice({
                 );
                 if (chat && Array.isArray(chat.members)) {
                     chat.members = chat.members.filter((m) => m.id !== userId);
+                }
+            })
+
+            // ✅ ADD THIS: handle chat refresh after adding members
+            .addCase(fetchChatById.fulfilled, (state, action) => {
+                const updatedChat = action.payload;
+                if (!updatedChat?.id) return;
+
+                const index = state.activeChats.findIndex(
+                    (c) =>
+                        c.id === updatedChat.id || c.chat_id === updatedChat.id
+                );
+
+                if (index !== -1) {
+                    state.activeChats[index] = updatedChat;
+                } else {
+                    state.activeChats.unshift(updatedChat);
                 }
             });
     },

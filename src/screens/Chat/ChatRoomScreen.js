@@ -36,16 +36,17 @@ import MessageBubble from '../../components/Chat/MessageBubble';
 import TypingIndicator from '../../components/Chat/TypingIndicator';
 import ThreadModal from '../../modals/ThreadModal';
 import GroupInfoModal from '../../modals/GroupInfoModal';
-import ActionModal from '../../modals/ActionModal'; // We are using this modal
-import QuizPromptModal from '../../modals/QuizPromptModal'; // You’ll create this modal
+import ActionModal from '../../modals/ActionModal';
+import QuizPromptModal from '../../modals/QuizPromptModal';
 
-import { generateQuizAI } from '../../store/actions/quizActions'; // You’ll add these
+import { generateQuizAI } from '../../store/actions/quizActions';
 import {
     sendMessage,
     fetchMessages,
     markChatAsReadThunk,
     queuePendingMessage,
     flushQueuedMessages,
+    fetchChatById, // ✅ NEW
 } from '../../store/actions/chatActions';
 import {
     appendMessage,
@@ -60,7 +61,7 @@ import {
     leaveChat,
     emitEvent,
 } from '../../utils/socket';
-import { getUserLocation } from '../../utils/utils'; // Assuming this function is in utils
+import { getUserLocation } from '../../utils/utils';
 
 const ChatRoomScreen = () => {
     const insets = useSafeAreaInsets();
@@ -117,7 +118,6 @@ const ChatRoomScreen = () => {
             };
         } else {
             const otherUser = chat.members?.find((u) => u.id !== senderId);
-
             const name = otherUser?.name || otherUser?.email || 'Direct Chat';
             const initials = name
                 .split(' ')
@@ -152,6 +152,13 @@ const ChatRoomScreen = () => {
         const showSub = Keyboard.addListener('keyboardDidShow', scrollToBottom);
         return () => showSub.remove?.();
     }, [chatId, dispatch]);
+
+    // ✅ Auto refresh chat (members etc.) when opening or groupInfo changes
+    useEffect(() => {
+        if (chatId) {
+            dispatch(fetchChatById(chatId));
+        }
+    }, [chatId, groupInfoVisible, dispatch]);
 
     useEffect(() => {
         if (!chatId) return;
@@ -199,12 +206,9 @@ const ChatRoomScreen = () => {
 
     useEffect(() => {
         if (actionModalVisible) {
-            // Fetch the user's current location when the modal is visible
             getUserLocation()
-                .then((location) => {
-                    setLocation(location);
-                })
-                .catch((error) => {
+                .then((location) => setLocation(location))
+                .catch(() => {
                     Alert.alert('Error', 'Unable to fetch location');
                 });
         }
@@ -219,7 +223,6 @@ const ChatRoomScreen = () => {
         }, 100);
     };
 
-    // Handle typing and sending messages
     const handleTyping = (text) => {
         setInputMessage(text);
         if (!isTyping) {

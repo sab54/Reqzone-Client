@@ -239,6 +239,24 @@ export const deleteChat = createAsyncThunk(
 );
 
 /**
+ * 📌 Fetch single chat by ID (e.g., after adding/removing members)
+ */
+export const fetchChatById = createAsyncThunk(
+    'chat/fetchChatById',
+    async (chatId, { rejectWithValue }) => {
+        try {
+            const response = await get(`${API_URL_CHAT}/${chatId}`);
+
+            console.log('fetchChatById response: ', response);
+
+            return response?.chat;
+        } catch (error) {
+            return rejectWithValue(error.message || 'Failed to fetch chat');
+        }
+    }
+);
+
+/**
  * 📌 Fetch chat messages
  */
 export const fetchMessages = createAsyncThunk(
