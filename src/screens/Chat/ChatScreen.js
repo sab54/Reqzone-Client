@@ -19,6 +19,8 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { reverseGeocode } from '../../utils/utils';
+
 // Components
 import ChatList from '../../module/ChatList';
 import Footer from '../../components/Footer';
@@ -193,7 +195,18 @@ const ChatScreen = () => {
                             address = data[0];
                             hasAddress = true;
                         }
-                    } catch (_) {}
+                    } catch (_) {
+                        const getReverseGeocode = await reverseGeocode(
+                            latitude,
+                            longitude
+                        );
+                        address = {
+                            street: getReverseGeocode.road,
+                            ...getReverseGeocode,
+                        };
+                        hasAddress = !getReverseGeocode.hasErrors;
+                        console.log('address: ', address, hasAddress);
+                    }
 
                     const result = await dispatch(
                         joinLocalGroup({

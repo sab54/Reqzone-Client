@@ -35,18 +35,18 @@ export const reverseGeocode = async (lat, lon) => {
             components.city ||
             '';
 
-        console.log('reverseGeocode components: ', components);
-
         return {
             countryCode,
             region,
             ...components,
+            hasErrors: false,
         };
     } catch (error) {
         console.error('Reverse geocoding failed:', error);
         return {
             countryCode: 'GB',
             region: 'England',
+            hasErrors: true,
         };
     }
 };
