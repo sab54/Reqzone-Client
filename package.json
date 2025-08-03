@@ -4,6 +4,7 @@
     "main": "index.js",
     "scripts": {
         "tunnel": "expo start --tunnel",
+        "lan": "expo start --lan",
         "start": "expo start",
         "android": "expo start --android",
         "ios": "expo start --ios",
