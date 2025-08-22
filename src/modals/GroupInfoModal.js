@@ -31,14 +31,19 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
 
     if (!chat) return null;
 
-    const isGroup = chat.is_group;
+    const isGroup = !!chat.is_group;
     const creatorId = chat.created_by || null;
     const styles = createStyles(theme, insets);
 
+    // Normalize members
     const participants = (chat.members || []).map((m) => ({
         id: m.id || m.user_id,
         name: m.name || `${m.first_name || ''} ${m.last_name || ''}`.trim(),
+        first_name: m.first_name,
+        last_name: m.last_name,
         email: m.email,
+        phone: m.phone || m.phone_number || null,
+        location: m.location || m.city || m.country || m.postal_code || null,
         avatar: m.avatar,
         role: m.role || 'member',
     }));
@@ -50,22 +55,55 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
         (a.name || '').localeCompare(b.name || '')
     );
 
-    const renderAvatar = (user) => {
-        if (user.avatar)
-            return (
-                <Image source={{ uri: user.avatar }} style={styles.avatar} />
-            );
+    // For 1:1 chat, determine the "other" user
+    const otherUser = !isGroup
+        ? participants.find((p) => p.id !== currentUserId) ||
+          participants[0] ||
+          null
+        : null;
 
-        const initials = (user.name || user.email || 'U')
+    const renderAvatar = (user, size = 64) => {
+        if (user?.avatar) {
+            return (
+                <Image
+                    source={{ uri: user.avatar }}
+                    style={[
+                        styles.avatar,
+                        {
+                            width: size,
+                            height: size,
+                            borderRadius: size / 2,
+                            marginRight: 0,
+                        },
+                    ]}
+                />
+            );
+        }
+        const base = user?.name || user?.email || 'U';
+        const initials = base
             .split(' ')
+            .filter(Boolean)
             .map((w) => w[0])
             .join('')
             .slice(0, 2)
             .toUpperCase();
-
         return (
-            <View style={styles.avatarFallback}>
-                <Text style={styles.avatarInitials}>{initials}</Text>
+            <View
+                style={[
+                    styles.avatarFallback,
+                    {
+                        width: size,
+                        height: size,
+                        borderRadius: size / 2,
+                        marginRight: 0,
+                    },
+                ]}
+            >
+                <Text
+                    style={[styles.avatarInitials, { fontSize: size * 0.35 }]}
+                >
+                    {initials}
+                </Text>
             </View>
         );
     };
@@ -77,8 +115,8 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
 
         return (
             <View style={styles.memberItem}>
-                {renderAvatar(item)}
-                <View style={{ flex: 1 }}>
+                {renderAvatar(item, 40)}
+                <View style={{ flex: 1, marginLeft: 12 }}>
                     <View style={styles.nameRow}>
                         <Text style={styles.memberName}>
                             {item.name || item.email || 'Unnamed'}
@@ -87,9 +125,9 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                         {isCreator && <Text style={styles.badge}>Creator</Text>}
                         {isAdmin && <Text style={styles.badge}>👑 Admin</Text>}
                     </View>
-                    {item.email && (
+                    {item.email ? (
                         <Text style={styles.memberEmail}>{item.email}</Text>
-                    )}
+                    ) : null}
                 </View>
 
                 {/* Owner can remove non-admins, not self */}
@@ -99,7 +137,6 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                         onPress={() => {
                             setSelectedUser(item);
-                            // close the group modal first; then open the confirm when it's fully hidden
                             setDeferConfirm(true);
                             onClose?.();
                         }}
@@ -107,6 +144,17 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                         <Text style={styles.removeText}>Remove</Text>
                     </Pressable>
                 )}
+            </View>
+        );
+    };
+
+    // Simple row for non-group info
+    const InfoRow = ({ label, value }) => {
+        if (!value) return null;
+        return (
+            <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{label}</Text>
+                <Text style={styles.infoValue}>{value}</Text>
             </View>
         );
     };
@@ -128,10 +176,10 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                 useNativeDriverForBackdrop
                 propagateSwipe
                 statusBarTranslucent
-                backdropTransitionOutTiming={0} // avoids flicker when chaining modals
+                backdropTransitionOutTiming={0} // avoid flicker when chaining modals
             >
                 <SafeAreaView style={styles.modalContent}>
-                    {/* Top absolute header wrapper must not steal touches */}
+                    {/* Header (don't steal touches) */}
                     <View style={styles.absWrapper} pointerEvents='box-none'>
                         <TouchableOpacity
                             style={styles.closeButton}
@@ -148,52 +196,99 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                     </View>
 
                     <Text style={styles.header}>
-                        {isGroup ? 'Group Members' : 'User Info'}
+                        {isGroup ? 'Group Members' : ''}
                     </Text>
 
-                    <Text style={styles.subheader}>
-                        {sortedParticipants.length} member
-                        {sortedParticipants.length !== 1 ? 's' : ''}
-                    </Text>
+                    {isGroup ? (
+                        <>
+                            <Text style={styles.subheader}>
+                                {sortedParticipants.length} member
+                                {sortedParticipants.length !== 1 ? 's' : ''}
+                            </Text>
 
-                    <FlatList
-                        data={sortedParticipants}
-                        keyExtractor={(item, index) =>
-                            item?.id?.toString?.() || `member-${index}`
-                        }
-                        renderItem={renderUser}
-                        contentContainerStyle={styles.listContent}
-                        keyboardShouldPersistTaps='handled'
-                        removeClippedSubviews={false}
-                    />
+                            <FlatList
+                                data={sortedParticipants}
+                                keyExtractor={(item, index) =>
+                                    item?.id?.toString?.() || `member-${index}`
+                                }
+                                renderItem={renderUser}
+                                contentContainerStyle={styles.listContent}
+                                keyboardShouldPersistTaps='handled'
+                                removeClippedSubviews={false}
+                            />
 
-                    {/* Bottom fixed bar must not blanket the list */}
-                    <View pointerEvents='box-none'>
-                        {isGroup && isOwner && (
-                            <TouchableOpacity
-                                style={styles.addButton}
-                                onPress={() => {
-                                    onClose?.();
-                                    navigation.navigate('AddPeopleScreen', {
-                                        mode: 'addToGroup',
-                                        chatId: chat.chat_id ?? chat.id,
-                                        existingMembers: participants.map(
-                                            (p) => p.id
-                                        ),
-                                    });
-                                }}
-                            >
-                                <Text style={styles.addButtonText}>
-                                    ➕ Add People
-                                </Text>
-                            </TouchableOpacity>
-                        )}
-                    </View>
+                            {/* Bottom bar (don't blanket the list) */}
+                            <View pointerEvents='box-none'>
+                                {isGroup && isOwner && (
+                                    <TouchableOpacity
+                                        style={styles.addButton}
+                                        onPress={() => {
+                                            onClose?.();
+                                            navigation.navigate(
+                                                'AddPeopleScreen',
+                                                {
+                                                    mode: 'addToGroup',
+                                                    chatId:
+                                                        chat.chat_id ?? chat.id,
+                                                    existingMembers:
+                                                        participants.map(
+                                                            (p) => p.id
+                                                        ),
+                                                }
+                                            );
+                                        }}
+                                    >
+                                        <Text style={styles.addButtonText}>
+                                            ➕ Add People
+                                        </Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        </>
+                    ) : (
+                        // 1:1 USER INFO
+                        <View style={styles.userInfoContainer}>
+                            <View style={styles.profileHeader}>
+                                {otherUser ? renderAvatar(otherUser, 72) : null}
+                                <View
+                                    style={{
+                                        marginTop: 12,
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <Text style={styles.profileName}>
+                                        {otherUser?.name ||
+                                            otherUser?.email ||
+                                            'Unnamed'}
+                                    </Text>
+                                    {otherUser?.role ? (
+                                        <Text style={styles.profileRole}>
+                                            {otherUser.role}
+                                        </Text>
+                                    ) : null}
+                                </View>
+                            </View>
+                            {console.log('User: ', otherUser)}
+                            <View style={styles.infoCard}>
+                                <InfoRow
+                                    label='Email'
+                                    value={otherUser?.email}
+                                />
+                                {/* <InfoRow
+                                    label='Phone'
+                                    value={otherUser?.phone}
+                                />
+                                <InfoRow
+                                    label='Location'
+                                    value={otherUser?.location}
+                                /> */}
+                            </View>
+                        </View>
+                    )}
                 </SafeAreaView>
             </Modal>
 
-            {/* This confirmation sits outside the group modal flow.
-          It opens AFTER the group modal closes (onModalHide). */}
+            {/* Confirmation after Group modal closes */}
             <ConfirmationModal
                 visible={showConfirm}
                 onClose={() => {
@@ -352,6 +447,48 @@ const createStyles = (theme, insets) => {
             fontFamily: 'Poppins',
             fontSize: 12,
             color: 'red',
+        },
+
+        /* === 1:1 user info styles === */
+        userInfoContainer: {
+            paddingHorizontal: 8,
+            paddingTop: 8,
+        },
+        profileHeader: {
+            alignItems: 'center',
+            marginBottom: 16,
+        },
+        profileName: {
+            fontSize: 18,
+            fontFamily: 'PoppinsBold',
+            color: theme.text,
+        },
+        profileRole: {
+            marginTop: 2,
+            fontSize: 12,
+            fontFamily: 'Poppins',
+            color: theme.mutedText,
+        },
+        infoCard: {
+            backgroundColor: theme.input,
+            borderRadius: 12,
+            padding: 12,
+        },
+        infoRow: {
+            paddingVertical: 10,
+            borderBottomWidth: StyleSheet.hairlineWidth,
+            borderBottomColor: theme.mutedText + '33',
+        },
+        infoLabel: {
+            fontFamily: 'Poppins',
+            fontSize: 12,
+            color: theme.mutedText,
+            marginBottom: 2,
+        },
+        infoValue: {
+            fontFamily: 'Poppins',
+            fontSize: 15,
+            color: theme.text,
         },
     });
 };
