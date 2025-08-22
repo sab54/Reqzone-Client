@@ -1,13 +1,13 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 
-// 🧩 Auth-related reducers
+// Auth-related reducers
 import loginReducer from './reducers/loginReducer';
 import registrationReducer from './reducers/registrationReducer';
 
-// 🎨 UI-related
+// UI-related
 import themeReducer from './reducers/themeReducer';
 
-// 📰 Feature modules
+// Feature modules
 import bookmarksReducer from './reducers/bookmarksReducer';
 import emergencyReducer from './reducers/emergencyReducer';
 import newsReducer from './reducers/newsReducer';
@@ -17,14 +17,14 @@ import chatReducer from './reducers/chatReducer';
 import gamificationReducer from './reducers/gamificationReducer';
 import documentsReducer from './reducers/documentsReducer';
 
-// 🎮 Game modules
+// Game modules
 import quizzesReducer from './reducers/quizReducer';
 import tasksReducer from './reducers/tasksReducer';
 import badgesReducer from './reducers/badgesReducer';
 import dashboardReducer from './reducers/dashboardReducer';
 import leaderboardReducer from './reducers/leaderboardReducer';
 
-// 🧠 Combine all feature slices
+// Combine all feature slices
 const rootReducer = combineReducers({
     // Auth
     auth: loginReducer,
@@ -38,7 +38,7 @@ const rootReducer = combineReducers({
     weather: weatherReducer,
     news: newsReducer,
     bookmarks: bookmarksReducer,
-    documents: documentsReducer, // ✅ Registered here
+    documents: documentsReducer,
     alerts: alertsReducer,
     emergency: emergencyReducer,
     gamification: gamificationReducer,
@@ -51,7 +51,7 @@ const rootReducer = combineReducers({
     leaderboard: leaderboardReducer,
 });
 
-// 🏪 Configure the Redux store
+// Configure the Redux store
 const store = configureStore({
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>

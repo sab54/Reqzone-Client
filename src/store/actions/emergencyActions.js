@@ -40,10 +40,6 @@ export const saveEmergencySettings = (settings) => async (dispatch) => {
     dispatch(setEmergencySettings(settings));
 };
 
-// ==========================
-// 📌 API-connected actions
-// ==========================
-
 // GET /emergency-contacts/:userId
 export const fetchEmergencyContacts = createAsyncThunk(
     'emergency/fetchContacts',

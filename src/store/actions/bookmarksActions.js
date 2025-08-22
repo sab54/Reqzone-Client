@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { get, post, del } from '../../utils/api';
 import { API_URL_NEWS } from '../../utils/apiPaths';
 
-// ✅ Load all bookmarks from the server
+// Load all bookmarks from the server
 export const loadBookmarks = createAsyncThunk(
     'bookmarks/loadBookmarks',
     async (_, { getState, rejectWithValue }) => {
@@ -23,7 +23,7 @@ export const loadBookmarks = createAsyncThunk(
     }
 );
 
-// ✅ Add a bookmark
+// Add a bookmark
 export const addBookmark = createAsyncThunk(
     'bookmarks/addBookmark',
     async (article, { getState, rejectWithValue }) => {
@@ -46,7 +46,7 @@ export const addBookmark = createAsyncThunk(
     }
 );
 
-// ✅ Remove a bookmark
+// Remove a bookmark
 export const removeBookmark = createAsyncThunk(
     'bookmarks/removeBookmark',
     async (article, { getState, rejectWithValue }) => {
@@ -68,7 +68,7 @@ export const removeBookmark = createAsyncThunk(
     }
 );
 
-// ✅ Clear all bookmarks (optional: uses /bookmarks/all)
+// Clear all bookmarks (optional: uses /bookmarks/all)
 export const clearBookmarksAndPersist = createAsyncThunk(
     'bookmarks/clearAllBookmarks',
     async (_, { getState, rejectWithValue }) => {

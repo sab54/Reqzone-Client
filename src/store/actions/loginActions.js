@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { post, patch } from '../../utils/api'; // Ensure patch is defined for PATCH requests
+import { post, patch } from '../../utils/api';
 import { API_URL_USERS } from '../../utils/apiPaths.js';
 
 /**
@@ -48,13 +48,12 @@ export const verifyOtp = createAsyncThunk(
  * Logout
  */
 export const logout = createAsyncThunk('auth/logout', async () => {
-    // Optional: clear any persisted user data
-    //await AsyncStorage.multiRemove(['countryCode', 'lastPhone']);
+    // await AsyncStorage.multiRemove(['countryCode', 'lastPhone']);
     return true;
 });
 
 /**
- * 🚀 Update user location
+ * Update user location
  */
 export const updateUserLocation = createAsyncThunk(
     'auth/updateUserLocation',

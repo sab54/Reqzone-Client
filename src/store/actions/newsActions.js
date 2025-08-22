@@ -80,10 +80,10 @@ export const fetchNewsData =
                     JSON.stringify(data.articles)
                 );
             } else {
-                console.warn('⚠️ No articles array in response:', data);
+                console.warn('No articles array in response:', data);
             }
         } catch (error) {
-            console.error('❌ News fetch error:', error);
+            console.error('News fetch error:', error);
         } finally {
             dispatch(setNewsLoading(false));
         }

@@ -8,7 +8,7 @@ export const registerUser = createAsyncThunk(
     async (userData, { rejectWithValue }) => {
         try {
             // Optional headers can be passed here
-            const headers = {}; // e.g., { Authorization: `Bearer ${token}` }
+            const headers = {};
 
             const data = await post(
                 `${API_URL_USERS}/register`,

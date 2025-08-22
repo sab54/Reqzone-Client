@@ -3,7 +3,7 @@ import { get, post, del } from '../../utils/api';
 import { API_URL_DOCUMENTS } from '../../utils/apiPaths';
 import { BASE_URL } from '../../utils/config';
 
-// ✅ Load all documents
+// Load all documents
 export const fetchDocuments = createAsyncThunk(
     'documents/fetchDocuments',
     async (_, { getState, rejectWithValue }) => {
@@ -27,7 +27,7 @@ export const fetchDocuments = createAsyncThunk(
     }
 );
 
-// ✅ Add a new document
+// Add a new document
 export const addDocument = createAsyncThunk(
     'documents/addDocument',
     async (doc, { getState, rejectWithValue }) => {
@@ -50,7 +50,7 @@ export const addDocument = createAsyncThunk(
     }
 );
 
-// ✅ Remove a document
+// Remove a document
 export const removeDocument = createAsyncThunk(
     'documents/removeDocument',
     async (doc, { getState, rejectWithValue }) => {
@@ -72,7 +72,7 @@ export const removeDocument = createAsyncThunk(
     }
 );
 
-// ✅ Clear all documents
+// Clear all documents
 export const clearAllDocuments = createAsyncThunk(
     'documents/clearAllDocuments',
     async (_, { getState, rejectWithValue }) => {
@@ -90,7 +90,7 @@ export const clearAllDocuments = createAsyncThunk(
     }
 );
 
-// ✅ Mark document as read
+// Mark document as read
 export const markDocumentAsRead = createAsyncThunk(
     'documents/markDocumentAsRead',
     async (documentId, { getState, rejectWithValue }) => {
@@ -111,7 +111,7 @@ export const markDocumentAsRead = createAsyncThunk(
     }
 );
 
-// ✅ Mark document as unread
+// Mark document as unread
 export const markDocumentAsUnread = createAsyncThunk(
     'documents/markDocumentAsUnread',
     async (documentId, { getState, rejectWithValue }) => {

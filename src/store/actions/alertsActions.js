@@ -118,7 +118,7 @@ export const fetchUserAlerts = createAsyncThunk(
     }
 );
 
-// 📌 Fetch System Alerts with Pagination & Category OR Full Fetch
+// Fetch System Alerts with Pagination & Category OR Full Fetch
 export const fetchAlertsData = createAsyncThunk(
     'alerts/fetchAlertsData',
     async (
@@ -184,7 +184,7 @@ export const fetchAlertsData = createAsyncThunk(
     }
 );
 
-// 📌 Create System Alert
+// Create System Alert
 export const createSystemAlert = createAsyncThunk(
     'alerts/createSystemAlert',
     async (
@@ -221,7 +221,7 @@ export const createSystemAlert = createAsyncThunk(
     }
 );
 
-// 📌 Create Emergency Alert
+// Create Emergency Alert
 export const createEmergencyAlert = createAsyncThunk(
     'alerts/createEmergencyAlert',
     async (
@@ -248,7 +248,7 @@ export const createEmergencyAlert = createAsyncThunk(
     }
 );
 
-// 📌 Mark Alert as Read
+// Mark Alert as Read
 export const markAlertAsRead = createAsyncThunk(
     'alerts/markAlertAsRead',
     async ({ alertId, alertType, userId }, { rejectWithValue }) => {
@@ -266,7 +266,7 @@ export const markAlertAsRead = createAsyncThunk(
     }
 );
 
-// 📌 Delete Alert
+// Delete Alert
 export const deleteAlert = createAsyncThunk(
     'alerts/deleteAlert',
     async (alertId, { rejectWithValue }) => {
@@ -279,7 +279,7 @@ export const deleteAlert = createAsyncThunk(
     }
 );
 
-// 📌 Load Pending Actions (mock or real)
+// Load Pending Actions (mock or real)
 export const loadPendingActions = createAsyncThunk(
     'alerts/loadPendingActions',
     async (_, { rejectWithValue }) => {
@@ -295,5 +295,5 @@ export const loadPendingActions = createAsyncThunk(
     }
 );
 
-// 📌 Clear Pending Actions (local only)
+// Clear Pending Actions (local only)
 export const clearPendingActions = () => ({ type: 'CLEAR_PENDING_ACTIONS' });

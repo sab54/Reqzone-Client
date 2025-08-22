@@ -1,4 +1,3 @@
-// themeActions.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Appearance } from 'react-native';
 import { setThemeMode, setEffectiveDarkMode } from '../reducers/themeReducer';
