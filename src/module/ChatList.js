@@ -214,7 +214,7 @@ const ChatList = forwardRef(
                     onItemPress={(chat) =>
                         navigation.navigate('ChatRoom', { chatId: chat.id })
                     }
-                    renderItemText={() => 'Chat item'} // ✅ Required, but placeholder
+                    renderItemText={() => 'Chat item'}
                     renderRightActions={(chat) => (
                         <View style={styles.swipeActionsWrapper}>
                             <TouchableOpacity

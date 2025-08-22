@@ -94,7 +94,7 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                     )}
                 </View>
 
-                {/* ✅ Only show remove button in group chats */}
+                {/* Only show remove button in group chats */}
                 {isGroup && !isSelf && !isAdmin && isOwner && (
                     <TouchableOpacity
                         style={styles.removeButton}

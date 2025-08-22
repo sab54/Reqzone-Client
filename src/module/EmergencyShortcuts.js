@@ -507,7 +507,7 @@ const EmergencyShortcuts = ({ theme }) => {
                     >
                         {selectedService?.presetMessages.map((msg) => (
                             <TouchableOpacity
-                                key={msg} // ✅ Updated for unique key warning
+                                key={msg}
                                 style={{ paddingVertical: 10 }}
                                 onPress={() => {
                                     sendSMS(defaultNumber, msg);
