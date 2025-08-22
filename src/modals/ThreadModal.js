@@ -1,5 +1,3 @@
-// /src/modals/ThreadModal.js
-
 import React, { useState, useContext } from 'react';
 import {
     Modal,

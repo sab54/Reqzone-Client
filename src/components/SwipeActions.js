@@ -2,13 +2,6 @@ import React from 'react';
 import { TouchableOpacity, Text, Animated, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-/**
- * props.actions should be an array of objects like:
- * [
- *   { type: 'open', label: 'Open\nDocument', icon: 'open-outline', color: '#3498db' },
- *   { type: 'bookmark', label: 'Add\nBookmark', icon: 'bookmark-outline', color: '#27ae60' },
- * ]
- */
 const SwipeActions = ({
     dragX,
     article,

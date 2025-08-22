@@ -35,7 +35,6 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
     const creatorId = chat.created_by || null;
     const styles = createStyles(theme, insets);
 
-    // ✅ Normalize participants
     const participants = (chat.members || []).map((m) => ({
         id: m.id || m.user_id,
         name: m.name || `${m.first_name || ''} ${m.last_name || ''}`.trim(),

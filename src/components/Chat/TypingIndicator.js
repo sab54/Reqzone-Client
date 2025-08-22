@@ -1,12 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet, Text } from 'react-native';
 
-/**
- * TypingIndicator component shows animated dots and user names (if provided).
- * @param {Object} props
- * @param {Object} props.theme
- * @param {Array<string>} [props.usernames] - Optional array of user display names
- */
 const TypingIndicator = ({ theme, usernames = [] }) => {
     const dot1 = useRef(new Animated.Value(0)).current;
     const dot2 = useRef(new Animated.Value(0)).current;
