@@ -20,7 +20,7 @@ const documentsSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            // ✅ Fetch documents
+            // Fetch documents
             .addCase(fetchDocuments.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -36,7 +36,7 @@ const documentsSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // ✅ Add document
+            // Add document
             .addCase(addDocument.fulfilled, (state, action) => {
                 state.documents.unshift(action.payload);
             })
@@ -44,7 +44,7 @@ const documentsSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // ✅ Remove document
+            // Remove document
             .addCase(removeDocument.fulfilled, (state, action) => {
                 state.documents = state.documents.filter(
                     (doc) => doc.url !== action.payload
@@ -54,7 +54,7 @@ const documentsSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // ✅ Clear all documents
+            // Clear all documents
             .addCase(clearAllDocuments.fulfilled, (state) => {
                 state.documents = [];
             })
@@ -62,7 +62,7 @@ const documentsSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // ✅ Mark document as read
+            // Mark document as read
             .addCase(markDocumentAsRead.fulfilled, (state, action) => {
                 const documentId = action.payload;
                 const doc = state.documents.find((d) => d.id === documentId);
@@ -72,7 +72,7 @@ const documentsSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // ✅ Mark document as unread
+            // Mark document as unread
             .addCase(markDocumentAsUnread.fulfilled, (state, action) => {
                 const documentId = action.payload;
                 const doc = state.documents.find((d) => d.id === documentId);

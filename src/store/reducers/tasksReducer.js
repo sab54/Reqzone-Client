@@ -25,7 +25,7 @@ const tasksSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // 📌 fetchTasks
+            // fetchTasks
             .addCase(fetchTasks.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -39,7 +39,7 @@ const tasksSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // 📌 fetchTaskProgress
+            // fetchTaskProgress
             .addCase(fetchTaskProgress.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -53,7 +53,7 @@ const tasksSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // 📌 completeTask
+            // completeTask
             .addCase(completeTask.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -71,7 +71,7 @@ const tasksSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // 📌 uncompleteTask
+            // uncompleteTask
             .addCase(uncompleteTask.pending, (state) => {
                 state.loading = true;
                 state.error = null;

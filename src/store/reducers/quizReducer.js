@@ -34,7 +34,7 @@ const quizzesSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // 📌 fetchQuizzes
+            // fetchQuizzes
             .addCase(fetchQuizzes.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -48,7 +48,7 @@ const quizzesSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // 📌 getQuizById
+            // getQuizById
             .addCase(getQuizById.pending, (state) => {
                 state.isLoadingQuiz = true;
                 state.error = null;
@@ -62,7 +62,7 @@ const quizzesSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // 📌 submitQuiz
+            // submitQuiz
             .addCase(submitQuiz.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -76,7 +76,7 @@ const quizzesSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // 📌 fetchQuizHistory
+            // fetchQuizHistory
             .addCase(fetchQuizHistory.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -90,7 +90,7 @@ const quizzesSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // 📌 fetchQuizStats
+            // fetchQuizStats
             .addCase(fetchQuizStats.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -104,14 +104,14 @@ const quizzesSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // 📌 generateQuizAI
+            // generateQuizAI
             .addCase(generateQuizAI.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(generateQuizAI.fulfilled, (state, action) => {
                 state.loading = false;
-                state.quizzes.unshift(action.payload); // insert newly created quiz
+                state.quizzes.unshift(action.payload);
             })
             .addCase(generateQuizAI.rejected, (state, action) => {
                 state.loading = false;
