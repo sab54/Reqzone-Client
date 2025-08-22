@@ -31,7 +31,7 @@ import {
     clearDraftGroupUsers,
     createGroupChat,
     startDirectMessage,
-    addUserToExistingGroup, // ✅ You must implement this
+    addUserToExistingGroup,
 } from '../../store/actions/chatActions';
 
 let searchDebounceTimeout;

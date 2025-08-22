@@ -264,7 +264,7 @@ const ChatRoomScreen = () => {
         if (!senderId || !chatId) return;
 
         if (messageType === 'quiz') {
-            setPendingQuizModal(true); // defer modal
+            setPendingQuizModal(true);
             return;
         }
 

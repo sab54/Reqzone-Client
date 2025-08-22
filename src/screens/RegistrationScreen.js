@@ -16,7 +16,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { CountryPicker } from 'react-native-country-codes-picker';
 import { registerUser } from '../store/actions/registrationActions';
-import * as Location from 'expo-location'; // 🚀 Replaced Geolocation with expo-location
+import * as Location from 'expo-location';
 
 const RegistrationScreen = () => {
     const { themeColors } = useSelector((state) => state.theme);

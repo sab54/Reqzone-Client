@@ -40,7 +40,7 @@ const OTPVerificationScreen = () => {
         return () => clearInterval(interval);
     }, []);
 
-    // ✅ Autofill OTP and auto-verify if flag is true
+    // Autofill OTP and auto-verify if flag is true
     useEffect(() => {
         if (autoFillOtp && otpCode && otpCode.length === 6) {
             const otpArray = otpCode.split('');
@@ -51,12 +51,12 @@ const OTPVerificationScreen = () => {
             const focusIndex = lastIndex === -1 ? 5 : lastIndex;
             inputs.current[focusIndex]?.focus();
 
-            // ✅ Auto-verify
+            // Auto-verify
             dispatch(verifyOtp({ user_id: userId, otp_code: otpCode }));
         }
     }, [autoFillOtp, otpCode]);
 
-    // 🚀 Navigate on success
+    // Navigate on success
     useEffect(() => {
         if (isVerified) {
             navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
@@ -72,7 +72,7 @@ const OTPVerificationScreen = () => {
             inputs.current[index + 1]?.focus();
         }
 
-        // ✅ Auto-submit when all digits are filled
+        // Auto-submit when all digits are filled
         const finalOtp = newOtp.join('');
         if (finalOtp.length === 6 && newOtp.every((d) => d !== '')) {
             dispatch(verifyOtp({ user_id: userId, otp_code: finalOtp }));
