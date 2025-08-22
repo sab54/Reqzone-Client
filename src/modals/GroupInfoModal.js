@@ -9,6 +9,7 @@ import {
     SafeAreaView,
     Dimensions,
     Platform,
+    Pressable,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import { Feather } from '@expo/vector-icons';
@@ -20,14 +21,13 @@ import ConfirmationModal from '../components/ConfirmationModal';
 
 const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
     const insets = useSafeAreaInsets();
-    const keyboardOffset = Platform.OS === 'ios' ? insets.top : 0;
-
     const currentUserId = useSelector((state) => state.auth.user?.id);
     const navigation = useNavigation();
     const dispatch = useDispatch();
 
     const [showConfirm, setShowConfirm] = React.useState(false);
     const [selectedUser, setSelectedUser] = React.useState(null);
+    const [deferConfirm, setDeferConfirm] = React.useState(false); // open confirm AFTER modal is closed
 
     if (!chat) return null;
 
@@ -51,15 +51,14 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
     );
 
     const renderAvatar = (user) => {
-        if (user.avatar) {
+        if (user.avatar)
             return (
                 <Image source={{ uri: user.avatar }} style={styles.avatar} />
             );
-        }
 
         const initials = (user.name || user.email || 'U')
             .split(' ')
-            .map((word) => word[0])
+            .map((w) => w[0])
             .join('')
             .slice(0, 2)
             .toUpperCase();
@@ -93,17 +92,20 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                     )}
                 </View>
 
-                {/* Only show remove button in group chats */}
+                {/* Owner can remove non-admins, not self */}
                 {isGroup && !isSelf && !isAdmin && isOwner && (
-                    <TouchableOpacity
+                    <Pressable
                         style={styles.removeButton}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                         onPress={() => {
                             setSelectedUser(item);
-                            setShowConfirm(true);
+                            // close the group modal first; then open the confirm when it's fully hidden
+                            setDeferConfirm(true);
+                            onClose?.();
                         }}
                     >
                         <Text style={styles.removeText}>Remove</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 )}
             </View>
         );
@@ -115,17 +117,35 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                 isVisible={visible}
                 onBackdropPress={onClose}
                 onBackButtonPress={onClose}
+                onModalHide={() => {
+                    if (deferConfirm && selectedUser) {
+                        setDeferConfirm(false);
+                        setShowConfirm(true);
+                    }
+                }}
                 style={styles.modal}
                 useNativeDriver
+                useNativeDriverForBackdrop
                 propagateSwipe
+                statusBarTranslucent
+                backdropTransitionOutTiming={0} // avoids flicker when chaining modals
             >
                 <SafeAreaView style={styles.modalContent}>
-                    <TouchableOpacity
-                        style={styles.closeButton}
-                        onPress={onClose}
-                    >
-                        <Feather name='x' size={20} color={theme.text} />
-                    </TouchableOpacity>
+                    {/* Top absolute header wrapper must not steal touches */}
+                    <View style={styles.absWrapper} pointerEvents='box-none'>
+                        <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={onClose}
+                            hitSlop={{
+                                top: 10,
+                                right: 10,
+                                bottom: 10,
+                                left: 10,
+                            }}
+                        >
+                            <Feather name='x' size={20} color={theme.text} />
+                        </TouchableOpacity>
+                    </View>
 
                     <Text style={styles.header}>
                         {isGroup ? 'Group Members' : 'User Info'}
@@ -143,33 +163,43 @@ const GroupInfoModal = ({ visible, onClose, chat, theme }) => {
                         }
                         renderItem={renderUser}
                         contentContainerStyle={styles.listContent}
+                        keyboardShouldPersistTaps='handled'
+                        removeClippedSubviews={false}
                     />
 
-                    {isGroup && isOwner && (
-                        <TouchableOpacity
-                            style={styles.addButton}
-                            onPress={() => {
-                                onClose();
-                                navigation.navigate('AddPeopleScreen', {
-                                    mode: 'addToGroup',
-                                    chatId: chat.chat_id ?? chat.id,
-                                    existingMembers: participants.map(
-                                        (p) => p.id
-                                    ),
-                                });
-                            }}
-                        >
-                            <Text style={styles.addButtonText}>
-                                ➕ Add People
-                            </Text>
-                        </TouchableOpacity>
-                    )}
+                    {/* Bottom fixed bar must not blanket the list */}
+                    <View pointerEvents='box-none'>
+                        {isGroup && isOwner && (
+                            <TouchableOpacity
+                                style={styles.addButton}
+                                onPress={() => {
+                                    onClose?.();
+                                    navigation.navigate('AddPeopleScreen', {
+                                        mode: 'addToGroup',
+                                        chatId: chat.chat_id ?? chat.id,
+                                        existingMembers: participants.map(
+                                            (p) => p.id
+                                        ),
+                                    });
+                                }}
+                            >
+                                <Text style={styles.addButtonText}>
+                                    ➕ Add People
+                                </Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
                 </SafeAreaView>
             </Modal>
 
+            {/* This confirmation sits outside the group modal flow.
+          It opens AFTER the group modal closes (onModalHide). */}
             <ConfirmationModal
                 visible={showConfirm}
-                onClose={() => setShowConfirm(false)}
+                onClose={() => {
+                    setShowConfirm(false);
+                    setSelectedUser(null);
+                }}
                 onConfirm={async () => {
                     if (selectedUser) {
                         await dispatch(
@@ -209,11 +239,18 @@ const createStyles = (theme, insets) => {
             paddingBottom: 120,
             flexGrow: 1,
         },
+        absWrapper: {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 10,
+        },
         closeButton: {
             position: 'absolute',
             top: 20,
             right: 20,
-            zIndex: 10,
+            zIndex: 11,
         },
         header: {
             fontSize: 20,
