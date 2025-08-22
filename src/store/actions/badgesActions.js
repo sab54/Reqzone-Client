@@ -2,9 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { API_URL_BADGES } from '../../utils/apiPaths';
 import { get, post } from '../../utils/api';
 
-/**
- * GET /badges - Fetch all available badges
- */
+// GET /badges - Fetch all available badges
 export const fetchAllBadges = createAsyncThunk(
     'badges/fetchAllBadges',
     async (_, { rejectWithValue }) => {
@@ -17,9 +15,7 @@ export const fetchAllBadges = createAsyncThunk(
     }
 );
 
-/**
- * GET /badges/user/:user_id - Fetch badges earned by user
- */
+// GET /badges/user/:user_id - Fetch badges earned by user
 export const fetchUserBadges = createAsyncThunk(
     'badges/fetchUserBadges',
     async (userId, { rejectWithValue }) => {
@@ -34,9 +30,7 @@ export const fetchUserBadges = createAsyncThunk(
     }
 );
 
-/**
- * POST /badges/award - Manually award a badge to a user
- */
+// POST /badges/award - Manually award a badge to a user
 export const awardBadgeToUser = createAsyncThunk(
     'badges/awardBadgeToUser',
     async ({ userId, badgeId }, { rejectWithValue }) => {

@@ -2,9 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { API_URL_TASKS } from '../../utils/apiPaths';
 import { get, post } from '../../utils/api';
 
-/**
- * GET /tasks - Fetch all active checklist tasks
- */
+// GET /tasks - Fetch all active checklist tasks
 export const fetchTasks = createAsyncThunk(
     'tasks/fetchTasks',
     async (userId, { rejectWithValue }) => {
@@ -17,9 +15,7 @@ export const fetchTasks = createAsyncThunk(
     }
 );
 
-/**
- * GET /tasks/progress/:user_id - Get user's completed task IDs
- */
+// GET /tasks/progress/:user_id - Get user's completed task IDs
 export const fetchTaskProgress = createAsyncThunk(
     'tasks/fetchTaskProgress',
     async (userId, { rejectWithValue }) => {
@@ -32,9 +28,7 @@ export const fetchTaskProgress = createAsyncThunk(
     }
 );
 
-/**
- * POST /tasks/complete - Mark a task as completed by user
- */
+// POST /tasks/complete - Mark a task as completed by user
 export const completeTask = createAsyncThunk(
     'tasks/completeTask',
     async ({ userId, taskId }, { rejectWithValue }) => {
@@ -48,9 +42,7 @@ export const completeTask = createAsyncThunk(
     }
 );
 
-/**
- * POST /tasks/uncomplete - Mark a task as not completed
- */
+// POST /tasks/uncomplete - Mark a task as not completed
 export const uncompleteTask = createAsyncThunk(
     'tasks/uncompleteTask',
     async ({ userId, taskId }, { rejectWithValue }) => {

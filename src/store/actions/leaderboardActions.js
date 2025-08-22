@@ -2,10 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { API_URL_LEADERBOARD } from '../../utils/apiPaths';
 import { get } from '../../utils/api';
 
-/**
- * GET /leaderboard - Top users globally or filtered by city/role
- * Accepts optional params: { city, role }
- */
+// GET /leaderboard - Top users globally or filtered by city/role
 export const fetchLeaderboard = createAsyncThunk(
     'leaderboard/fetchLeaderboard',
     async ({ city = null, role = null } = {}, { rejectWithValue }) => {

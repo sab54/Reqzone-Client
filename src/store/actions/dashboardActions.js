@@ -2,9 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { API_URL_DASHBOARD } from '../../utils/apiPaths';
 import { get } from '../../utils/api';
 
-/**
- * GET /dashboard/:user_id - Fetch full dashboard data for user
- */
+// GET /dashboard/:user_id - Fetch full dashboard data for user
 export const fetchDashboard = createAsyncThunk(
     'dashboard/fetchDashboard',
     async (userId, { rejectWithValue }) => {

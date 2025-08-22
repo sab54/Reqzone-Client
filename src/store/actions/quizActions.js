@@ -2,9 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { API_URL_QUIZZES } from '../../utils/apiPaths';
 import { get, post } from '../../utils/api';
 
-/**
- * GET /quizzes - Fetch all active quizzes
- */
+// GET /quizzes - Fetch all active quizzes
 export const fetchQuizzes = createAsyncThunk(
     'quizzes/fetchQuizzes',
     async (userId, { rejectWithValue }) => {
@@ -17,9 +15,7 @@ export const fetchQuizzes = createAsyncThunk(
     }
 );
 
-/**
- * GET /quizzes/:id - Fetch quiz with questions & options
- */
+// GET /quizzes/:id - Fetch quiz with questions & options
 export const getQuizById = createAsyncThunk(
     'quizzes/getQuizById',
     async (quizId, { rejectWithValue }) => {
@@ -32,9 +28,7 @@ export const getQuizById = createAsyncThunk(
     }
 );
 
-/**
- * POST /quizzes/:id/submit - Submit quiz answers
- */
+// POST /quizzes/:id/submit - Submit quiz answers
 export const submitQuiz = createAsyncThunk(
     'quizzes/submitQuiz',
     async ({ quizId, userId, answers }, { rejectWithValue }) => {
@@ -54,9 +48,7 @@ export const submitQuiz = createAsyncThunk(
     }
 );
 
-/**
- * GET /quizzes/history/:user_id - Get user's quiz submission history
- */
+// GET /quizzes/history/:user_id - Get user's quiz submission history
 export const fetchQuizHistory = createAsyncThunk(
     'quizzes/fetchQuizHistory',
     async (userId, { rejectWithValue }) => {
@@ -71,9 +63,7 @@ export const fetchQuizHistory = createAsyncThunk(
     }
 );
 
-/**
- * GET /quizzes/:id/stats - Get aggregated quiz performance
- */
+// GET /quizzes/:id/stats - Get aggregated quiz performance
 export const fetchQuizStats = createAsyncThunk(
     'quizzes/fetchQuizStats',
     async (quizId, { rejectWithValue }) => {
@@ -88,9 +78,7 @@ export const fetchQuizStats = createAsyncThunk(
     }
 );
 
-/**
- * POST /ai/generate-quiz - Generate a new quiz using AI
- */
+// POST /ai/generate-quiz - Generate a new quiz using AI
 export const generateQuizAI = createAsyncThunk(
     'quizzes/generateQuizAI',
     async ({ topic, difficulty, createdBy, chatId }, { rejectWithValue }) => {
