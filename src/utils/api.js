@@ -1,11 +1,6 @@
 import { BASE_URL } from './config';
 import { encryptBody, decryptBody } from './crypto';
 
-/**
- * Handle and normalize fetch responses (with decryption)
- * @param {Response} response
- * @returns {Promise<any>}
- */
 const handleResponse = async (response) => {
     const data = await response.json().catch(() => ({}));
 
