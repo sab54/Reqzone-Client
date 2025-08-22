@@ -34,7 +34,7 @@ const MessageBubble = ({ senderId, message, theme, openThread }) => {
     };
 
     const handleReact = () => {
-        Alert.alert('React', '❤️ reaction added (demo only)');
+        Alert.alert('React', '❤️ reaction added (UI only)');
         setActionVisible(false);
     };
 
@@ -44,7 +44,8 @@ const MessageBubble = ({ senderId, message, theme, openThread }) => {
     };
 
     const handleReply = () => {
-        openThread(message);
+        Alert.alert('Reply', 'This would reply to the message (UI only).');
+        //openThread(message); //! Not Working
         setActionVisible(false);
     };
 
