@@ -68,8 +68,6 @@ import ChatScreen from './src/screens/Chat/ChatScreen';
 import ChatRoomScreen from './src/screens/Chat/ChatRoomScreen';
 import AddPeopleScreen from './src/screens/Chat/AddPeopleScreen';
 
-import SettingsScreen from './src/screens/SettingsScreen';
-
 const { width: screenWidth } = Dimensions.get('window');
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -239,22 +237,6 @@ const TabNavigator = ({ navigationRef }) => {
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         onPress={() => {
-                                            closeModal();
-                                            navigation.navigate('Settings');
-                                        }}
-                                        style={styles.menuItem}
-                                    >
-                                        <Ionicons
-                                            name='settings-outline'
-                                            size={18}
-                                            color={themeColors.text}
-                                        />
-                                        <Text style={styles.menuText}>
-                                            Settings
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => {
                                             dispatch(logout());
                                             closeModal();
                                         }}
@@ -331,10 +313,6 @@ const AppNavigation = ({ navigationRef }) => {
                             name='AddPeopleScreen'
                             component={AddPeopleScreen}
                         />
-                        <Stack.Screen
-                            name='Settings'
-                            component={SettingsScreen}
-                        />
                         <Stack.Screen name='Quiz' component={QuizScreen} />
                         <Stack.Screen
                             name='BadgesScreen'
@@ -378,7 +356,7 @@ const MainApp = () => {
         }
     }, [user, navigationRef]);
 
-    // 🌍 Update user location using expo-location
+    // Update user location using expo-location
     useEffect(() => {
         let locationSubscription = null;
         const startLocationUpdates = async () => {

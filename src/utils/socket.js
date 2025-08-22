@@ -110,7 +110,7 @@ export const leaveChat = (chatId) => {
     }
 };
 
-// 🟡 NEW: Typing Indicator Emitters
+// NEW: Typing Indicator Emitters
 export const sendTypingStart = (chatId, userId) => {
     if (socket && isConnected && chatId && userId) {
         socket.emit('chat:typing_start', { chatId, userId });

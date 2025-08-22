@@ -3,7 +3,7 @@ import * as Location from 'expo-location';
 
 import { OPENCAGE_API_KEY } from './config';
 
-// 📌 Get User's Coordinates via Expo Location API
+// Get User's Coordinates via Expo Location API
 export const getUserLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
 
@@ -18,7 +18,7 @@ export const getUserLocation = async () => {
     };
 };
 
-// 📌 Reverse Geocode to Get Country Code from Coordinates
+// Reverse Geocode to Get Country Code from Coordinates
 export const reverseGeocode = async (lat, lon) => {
     try {
         const res = await axios.get(

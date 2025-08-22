@@ -14,7 +14,7 @@ const handleResponse = async (response) => {
         throw new Error(errorMessage);
     }
 
-    // 🔓 Decrypt if payload exists
+    // Decrypt if payload exists
     if (data?.payload) {
         try {
             let decryptedContent = decryptBody(data.payload);
