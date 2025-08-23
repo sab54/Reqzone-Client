@@ -3,9 +3,9 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "tunnel": "expo start --tunnel",
+        "tunnel": "expo start --tunnel --no-dev",
         "lan": "expo start --lan",
-        "start": "expo start",
+        "start": "expo start --no-dev",
         "android": "expo start --android",
         "ios": "expo start --ios",
         "web": "expo start --web"
