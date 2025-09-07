@@ -140,7 +140,7 @@ const HomeScreen = () => {
                     <Text style={styles.headerText}>
                         <Text style={{ color: '#DB4437' }}>Res</Text>
                         <Text style={{ color: '#4285F4' }}>Q</Text>
-                        <Text style={{ color: '#0F9D58' }}>Zone</Text>
+                        <Text style={{ color: '#0F9D58' }}>Zone-Sunidhi</Text>
                     </Text>
                     <Text style={styles.subtitle}>
                         <Text style={{ color: '#DB4437' }}>Respond</Text>
