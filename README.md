@@ -1,1 +1,2 @@
 # ResQZone App
+Author: Sunidhi
