@@ -29,7 +29,6 @@ export const mockWeatherData = {
     id: 2643743,
     name: 'London',
     cod: 200,
-    alerts: [{ event: 'Earthquake in next 2 hours' }],
 };
 
 export const mockForecastData = {
