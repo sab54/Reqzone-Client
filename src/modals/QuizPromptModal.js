@@ -13,20 +13,32 @@ import { Feather } from '@expo/vector-icons';
 const QuizPromptModal = ({ visible, onClose, onCreate, theme }) => {
     const [topic, setTopic] = useState('');
     const [difficulty, setDifficulty] = useState('easy');
+    const [items, setItems] = useState(['']);
 
     const styles = createStyles(theme);
 
     const handleSubmit = () => {
-        const trimmed = topic.trim();
-        if (!trimmed) {
+        const trimmedTopic = topic.trim();
+        if (!trimmedTopic) {
             Alert.alert('Missing Topic', 'Please enter a topic to continue.');
             return;
         }
 
-        onCreate({ topic: trimmed, difficulty });
+        // Send only topic and difficulty; server adds checklist
+        const newQuiz = {
+            topic: trimmedTopic,
+            difficulty,
+            createdBy: theme.currentUserId,
+            chatId: theme.currentChatId,
+        };
+
+        onCreate(newQuiz);
+
+        // Reset inputs
         setTopic('');
         setDifficulty('easy');
     };
+
 
     return (
         <Modal
@@ -58,7 +70,7 @@ const QuizPromptModal = ({ visible, onClose, onCreate, theme }) => {
                             style={[
                                 styles.diffButton,
                                 difficulty === level &&
-                                    styles.diffButtonSelected,
+                                styles.diffButtonSelected,
                             ]}
                             onPress={() => setDifficulty(level)}
                         >
@@ -66,7 +78,7 @@ const QuizPromptModal = ({ visible, onClose, onCreate, theme }) => {
                                 style={[
                                     styles.diffText,
                                     difficulty === level &&
-                                        styles.diffTextSelected,
+                                    styles.diffTextSelected,
                                 ]}
                             >
                                 {level.charAt(0).toUpperCase() + level.slice(1)}

@@ -100,19 +100,35 @@ const TasksScreen = () => {
         [quizHistory]
     );
 
-    const allItems = useMemo(() => {
-        return [
-            ...tasks.map((task) => ({ ...task, type: 'task' })),
-            ...quizzes.map((quiz) => ({ ...quiz, type: 'quiz' })),
-        ];
-    }, [tasks, quizzes]);
+const allItems = useMemo(() => {
+    const quizItems = quizzes.map(q => ({
+        ...q,
+        type: 'quiz',
+    }));
+
+    // Some tasks may actually be checklist tasks from backend
+    const taskItems = tasks.map(t => ({
+        ...t,
+        type: Array.isArray(t.items) ? 'checklist' : 'task',
+    }));
+
+    return [
+        ...taskItems,
+        ...quizItems,
+    ];
+}, [tasks, quizzes]);
+
+
 
     const filteredItems = useMemo(() => {
         const base = allItems.filter((item) => {
-            if (selectedTab === 'checklist' && item.type !== 'task')
-                return false;
+            // Tab filtering
+            if (selectedTab === 'checklist' && item.type !== 'task') return false;
             if (selectedTab === 'quiz' && item.type !== 'quiz') return false;
-            return item.title?.toLowerCase().includes(query.toLowerCase());
+            // Only filter by query if there is a query
+            if (query && !item.title?.toLowerCase().includes(query.toLowerCase())) return false;
+
+            return true;
         });
 
         return base.sort((a, b) => {
@@ -124,12 +140,16 @@ const TasksScreen = () => {
                 b.type === 'task'
                     ? completedTaskIds.includes(b.id)
                     : completedQuizIds.includes(b.id);
+
             if (aCompleted !== bCompleted) return aCompleted ? 1 : -1;
-            const aTime = new Date(a.due_date || a.created_at).getTime();
-            const bTime = new Date(b.due_date || b.created_at).getTime();
+
+            const aTime = new Date(a.due_date || a.created_at || 0).getTime();
+            const bTime = new Date(b.due_date || b.created_at || 0).getTime();
             return bTime - aTime;
         });
     }, [allItems, selectedTab, query, completedTaskIds, completedQuizIds]);
+
+
 
     const paginated = filteredItems.slice(0, page * PAGE_SIZE);
 
@@ -163,6 +183,27 @@ const TasksScreen = () => {
     };
 
     const renderItemText = (item) => {
+        if (item.type === 'checklist') {
+            return (
+                <View>
+                    <Text style={[styles.taskTitle, { color: theme.title }]}>{item.title}</Text>
+                    {item.items.map((i, idx) => (
+                        <View key={idx} style={{ marginBottom: 4 }}>
+                            <Text style={[styles.taskDesc, { color: theme.text }]}>
+                                • {typeof i === 'string' ? i : i.title}
+                            </Text>
+                            {typeof i === 'object' && i.description && (
+                                <Text style={[styles.taskDesc, { color: theme.text, marginLeft: 10 }]}>
+                                    {i.description}
+                                </Text>
+                            )}
+
+                        </View>
+                    ))}
+
+                </View>
+            );
+        }
         const isCompleted =
             item.type === 'task'
                 ? completedTaskIds.includes(item.id)
