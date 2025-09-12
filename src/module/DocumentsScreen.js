@@ -82,9 +82,18 @@ const DocumentsScreen = ({ theme }) => {
         { label: 'Local', icon: 'location-outline' },
     ];
 
-    const filteredDocuments = documents.filter((doc) =>
-        doc.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredDocuments = documents.filter((doc) => {
+        const matchesSearch = doc.title
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase());
+
+        const matchesCategory =
+            selectedCategory === 'All' ||
+            doc.category?.toLowerCase() === selectedCategory.toLowerCase();
+
+        return matchesSearch && matchesCategory;
+    });
+
 
     return (
         <View
