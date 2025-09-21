@@ -226,6 +226,8 @@ it('blocks register action until form is valid, then allows it', async () => {
       phoneNumber: '0123456789',
       countryCode: '+1',
       userId: 'user-123',
+      autoFillOtp: true,
+      otpCode: undefined
     });
   });
 });

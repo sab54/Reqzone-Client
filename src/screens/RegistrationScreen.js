@@ -52,6 +52,7 @@ import { useNavigation } from '@react-navigation/native';
 import { CountryPicker } from 'react-native-country-codes-picker';
 import { registerUser } from '../store/actions/registrationActions';
 import * as Location from 'expo-location';
+import { autoSetOTP } from '../utils/config';
 
 const RegistrationScreen = () => {
     const { themeColors } = useSelector((state) => state.theme);
@@ -98,6 +99,8 @@ const RegistrationScreen = () => {
                 phoneNumber: form.phoneNumber,
                 countryCode: form.countryCode,
                 userId: user.user_id,
+                otpCode: user.otp_code,
+                autoFillOtp: autoSetOTP
             });
         }
     }, [user]);
