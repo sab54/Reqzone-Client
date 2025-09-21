@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LevelUpToast matches snapshot 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "#ffffff",
+      "borderRadius": 10,
+      "bottom": 100,
+      "elevation": 6,
+      "left": 20,
+      "opacity": 1,
+      "padding": 15,
+      "position": "absolute",
+      "right": 20,
+      "shadowColor": "#654321",
+      "shadowOffset": {
+        "height": 2,
+        "width": 0,
+      },
+      "shadowOpacity": 0.15,
+      "shadowRadius": 4,
+    }
+  }
+>
+  <Text
+    style={
+      [
+        {
+          "fontFamily": "PoppinsBold",
+          "fontSize": 15,
+        },
+        {
+          "color": "#123456",
+        },
+      ]
+    }
+  >
+    🎉 Level Up! You're now Level 
+    3
+    !
+  </Text>
+</View>
+`;

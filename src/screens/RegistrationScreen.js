@@ -1,3 +1,38 @@
+// src/screens/RegistrationScreen.js
+/**
+ * RegistrationScreen.js
+ *
+ * Purpose:
+ * End-user registration UI that collects identity, contact, and country code;
+ * validates inputs; optionally captures geolocation; and dispatches a
+ * registration action. On success, navigates to OTP verification.
+ *
+ * Key Responsibilities:
+ * - **Form & Validation**: Tracks first/last name, email, phone (digits only),
+ *   country code (via CountryPicker), and marks form valid when:
+ *   `firstName` non-empty, `email` matches simple regex, and `phoneNumber` is 10 digits.
+ * - **Location & Register**: On "Register", requests foreground location
+ *   permission via `expo-location`; if granted, gets coordinates and dispatches
+ *   `registerUser` with `{ first_name, last_name, email, phone_number, country_code, latitude, longitude }`.
+ * - **Navigation**: When `registration.user` becomes truthy, navigates to
+ *   `OTPVerification` with `{ phoneNumber, countryCode, userId }` derived from form and store.
+ * - **Loading & Errors**: While registering, shows an `ActivityIndicator`
+ *   inside the button; renders server `error` text when present.
+ * - **Country Picker**: Toggles a bottom-sheet picker to select and store a
+ *   dial code (e.g., "+44").
+ *
+ * Store/Action Contracts:
+ * - Reads `theme.themeColors` for palette.
+ * - Reads `registration.loading`, `registration.error`, `registration.user`.
+ * - Dispatches `registerUser(...)`.
+ *
+ * Notes:
+ * - Tests account for React 18 double-invoked effects by asserting call presence,
+ *   not exact counts.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useState, useEffect } from 'react';
 import {
     View,

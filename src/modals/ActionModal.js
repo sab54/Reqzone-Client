@@ -1,3 +1,19 @@
+/**
+ * ActionModal Component
+ * 
+ * This component is a modal used to display a list of action options to the user.
+ * It allows for the user to select an option, which is then handled by a callback.
+ * The modal can also be in a loading state, where it displays a loading message instead of options.
+ * 
+ * Props:
+ * - `visible` (bool): Controls the visibility of the modal.
+ * - `onClose` (function): Callback function to close the modal.
+ * - `onSelect` (function): Callback function triggered when an action option is selected.
+ * - `theme` (object): Contains theme colors used in styling the modal.
+ * - `options` (array): A list of action options, each with an emoji, label, and action string.
+ * - `loadingMessage` (string): Custom message displayed when the modal is in loading state (default is 'Loading...').
+ * - `onModalHide` (function): Callback function triggered when the modal is completely hidden.
+ */
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';

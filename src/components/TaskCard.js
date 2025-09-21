@@ -1,3 +1,50 @@
+/**
+ * TaskCard.js
+ *
+ * A compact, tappable card that displays a task with its label, due date,
+ * optional tags indicator, and an earned XP badge when the task is completed.
+ * Visual state and iconography adapt based on `isCompleted`.
+ *
+ * Key functionalities:
+ * - **Completion State UI**:
+ *   - Icon toggles between "ellipse-outline" (incomplete) and "checkmark-circle" (completed).
+ *   - Card style updates when completed: background uses `theme.highlight`, card opacity reduced.
+ *   - Icon color uses `theme.success` when completed; otherwise `theme.border`.
+ *
+ * - **Task Metadata**:
+ *   - Renders the task label (2 lines max).
+ *   - Shows a `DueTag` component for the `item.dueDate`.
+ *   - Shows a small colored dot when `item.tags` is non-empty, using `theme.accent` (fallback `theme.primary`).
+ *
+ * - **XP Badge**:
+ *   - When `isCompleted` and `item.xp` is provided, displays "+{xp} XP" with `theme.success` color.
+ *
+ * - **Interaction**:
+ *   - Tapping the card calls the provided `onPress`.
+ *   - Accessibility: `accessibilityLabel` is "`{item.label} task`", and
+ *     `accessibilityHint` instructs to "Press to complete/unmark this task" depending on state.
+ *
+ * Theming (defaults shown below):
+ * - `success = '#27ae60'`  : success/positive color (completed icon & XP)
+ * - `border  = '#ccc'`     : neutral border (incomplete icon)
+ * - `highlight = '#f0f8ff'`: completed card background
+ * - `card = '#fff'`        : default card background
+ * - `text = '#333'`        : label color
+ * - `shadow = '#000'`      : shadow color
+ * - `accent = '#f39c12'`   : tag-dot color (primary fallback)
+ * - `primary = '#3498db'`  : fallback for accent/tag-dot
+ *
+ * Props:
+ * - `item: { label: string, dueDate?: string|Date, tags?: any[], xp?: number }`
+ * - `isCompleted: boolean`
+ * - `onPress: () => void`
+ * - `theme?: Partial<{
+ *     success, border, highlight, card, text, shadow, accent, primary
+ *   }>`
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React from 'react';
 import {
     View,

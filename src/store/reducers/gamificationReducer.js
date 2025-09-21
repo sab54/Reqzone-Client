@@ -1,3 +1,28 @@
+// src/store/reducers/gamificationReducer.js
+/**
+ * gamificationReducer.js
+ *
+ * Tracks user gamification progress:
+ * - `xp`: current experience points within the active level
+ * - `level`: current level (starts at 1)
+ * - `nextLevelXP`: XP required to reach the next level (100 * level)
+ * - `badges`: unlocked or auto-awarded achievements
+ *
+ * Actions:
+ * - `GAIN_XP (amount)`
+ *   - Adds XP, looping to handle multiple level-ups if `xp >= nextLevelXP`.
+ *   - Each level-up pushes a `'levelup'` badge.
+ * - `UNLOCK_BADGE (badgeId)`
+ *   - Adds badge if not already present.
+ * - `RESET_GAMIFICATION`
+ *   - Resets to the initial state.
+ *
+ * Notes:
+ * - Level scaling is simple: 100 * level.
+ * - XP rolls over when leveling up.
+ * - Badges array is append-only, except reset.
+ */
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const initialState = {

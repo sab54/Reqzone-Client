@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Footer matches snapshot 1`] = `
+<View
+  style={
+    [
+      {
+        "alignItems": "center",
+        "justifyContent": "center",
+        "paddingVertical": 20,
+      },
+      {
+        "backgroundColor": "#123456",
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      [
+        {
+          "fontFamily": "Poppins",
+          "fontSize": 13,
+          "opacity": 0.6,
+        },
+        {
+          "color": "#abcdef",
+        },
+      ]
+    }
+  >
+    Designed with ❤️ by Su
+  </Text>
+</View>
+`;

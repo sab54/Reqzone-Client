@@ -1,3 +1,42 @@
+// src/store/reducers/chatReducer.js
+/**
+ * chatReducer.js
+ *
+ * Centralized chat state:
+ * - `allUsers`: suggestion list for starting chats
+ * - `draftGroupUsers`: staging list while composing a new group
+ * - `activeChats`: list of chat summaries (DMs + groups)
+ * - `messagesByChatId`: map<chatId, Message[]>
+ * - `lastReadByChatId`: map<chatId, lastReadMessageId>
+ * - `queuedMessagesByChatId`: map<chatId, Message[]> (local "pending" echo)
+ * - `typingUsersByChatId`: map<chatId, User[]>
+ * - `loading` / `error`: async flags for thunked ops
+ *
+ * Local reducers:
+ * - `updateActiveChatsFromSocket(list)` → replaces `activeChats` when socket pushes updates; non-arrays become `[]`.
+ * - `appendMessage({ chatId, message })` → idempotent append (skips if id already exists).
+ * - `queuePendingMessage({ chatId, senderId, message })` → pushes a temp `"pending"` echo to both `queuedMessagesByChatId[chatId]` and `messagesByChatId[chatId]`.
+ * - `clearQueuedMessages(chatId)` → deletes `queuedMessagesByChatId[chatId]`.
+ * - `markChatAsRead({ chatId, messageId })` → stamps `lastReadByChatId[chatId]`.
+ * - `setTypingUser({ chatId, user })` / `removeTypingUser({ chatId, userId })` → maintain a de-duplicated typing list.
+ *
+ * Extra reducers (thunks):
+ * - `fetchUserSuggestions` / `fetchActiveChats` → pending sets `loading=true, error=null`; fulfilled replaces lists; rejected sets `error`.
+ * - `startDirectMessage` / `createGroupChat` → unshift new chat if not already present (dedupe by `chat_id` or `id`); `createGroupChat` also clears `draftGroupUsers`.
+ * - `deleteChat` → removes chat (by `chat_id` or `id`) and deletes its messages.
+ * - `fetchMessages` → replaces `messagesByChatId[chatId]`.
+ * - `sendMessage` → idempotent append into `messagesByChatId[chatId]`.
+ * - `markChatAsReadThunk` → stamps `lastReadByChatId[chatId]`.
+ * - `addUserToDraftGroup` / `removeUserFromDraftGroup` / `clearDraftGroupUsers` → manage draft group list.
+ * - `removeUserFromGroup` → removes a member from a specific chat’s `members`.
+ * - `fetchChatById` → upsert chat details into `activeChats`.
+ *
+ * Notes:
+ * - All updates are immutable via RTK's Immer.
+ * - Idempotence: message appenders check `message.id` before pushing.
+ * - Dedupe for chats accepts either `chat_id` or `id` on incoming payloads.
+ */
+
 import { createSlice } from '@reduxjs/toolkit';
 import {
     fetchUserSuggestions,

@@ -1,3 +1,38 @@
+// src/theme/getThemeColors.js
+/**
+ * getThemeColors
+ *
+ * Utility function that returns a theme color palette object based on whether dark mode is enabled.
+ *
+ * Key functionalities:
+ * - **Dark/Light Mode Detection**: Accepts a boolean (`isDarkMode`) and returns the full set of themed colors accordingly.
+ * - **Semantic Colors**: Provides structured color values for:
+ *   - Layout & Backgrounds (e.g., background, card, surface, overlay).
+ *   - Typography (e.g., title, text, mutedText, placeholder).
+ *   - Inputs & Borders (e.g., input, inputText, inputBorder).
+ *   - Buttons (primary, secondary, disabled).
+ *   - Status Feedback (success, error, warning, info).
+ *   - Actions & Interactions (actionBackground, actionText, disabled).
+ *   - Visuals (icons, links, badges, shadows, dividers).
+ *   - Structural Elements (header, footer, modal).
+ *
+ * Return Value:
+ * - An object mapping descriptive keys (e.g., `background`, `text`, `success`) to their corresponding hex or rgba color strings.
+ *
+ * Usage:
+ * ```js
+ * import { getThemeColors } from '@/theme/getThemeColors';
+ * const colors = getThemeColors(true);  // Dark mode
+ * const colors = getThemeColors(false); // Light mode
+ * ```
+ *
+ * Notes:
+ * - Ensures consistency across app UI by centralizing theme color definitions.
+ * - The color tokens are semantic rather than literal, so consumers should not hardcode colors directly.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 export const getThemeColors = (isDarkMode) => ({
     mode: isDarkMode ? 'dark' : 'light',
     // Layout & Backgrounds

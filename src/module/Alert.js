@@ -1,3 +1,54 @@
+// screens/Alert.js
+/**
+ * Alert.js
+ *
+ * The Alert screen aggregates and displays alert messages from multiple sources
+ * (system, emergency, and global weather hazards). It supports client-side
+ * filtering (by category and search), distance-based visibility based on the
+ * user’s current location, pagination, and per-item actions (mark as read).
+ *
+ * Key functionalities:
+ * - Fetching & Pagination:
+ *   - On mount, fetches global hazard alerts and the first page of alerts for
+ *     the currently selected category (default: "System"). Supports loading
+ *     subsequent pages on demand while preserving the last HTTP state.
+ * - Category Tabs:
+ *   - Lets users switch between "System", "Emergency", and "Weather" views.
+ *     Switching a tab triggers a fresh fetch for page 1 of that category.
+ * - Search:
+ *   - Local text filter over alert title/message. Case-insensitive matching.
+ * - Geofenced Visibility:
+ *   - If an alert includes latitude/longitude and a radius (km), it’s only
+ *     shown when the user’s current location (via expo-location) falls within
+ *     that radius.
+ * - Read State:
+ *   - Swipe action marks an alert as read using `markAlertAsRead`, preserving
+ *     user-specific state when `user?.id` is present.
+ * - External Links:
+ *   - Tapping an alert opens its URL in the system browser when provided.
+ *
+ * Data flow:
+ * 1. On mount:
+ *    - Dispatch `fetchGlobalHazardAlerts()`.
+ *    - Ask for foreground location permissions; if granted, store coordinates.
+ *    - Fetch alerts for the initial category (page 1), optionally enriched by `user?.id`.
+ * 2. On tab change:
+ *    - Fetch alerts for the new category (page 1).
+ * 3. On "load more":
+ *    - Fetch next page for the current category; append to existing list.
+ * 4. On swipe action:
+ *    - Dispatch `markAlertAsRead({ alertId, alertType, userId })`.
+ *
+ * Notes:
+ * - Haversine distance is used for geofence checks (Earth radius: 6371km).
+ * - `SwipeableList`, `Tabs`, and `SearchBar` are presentational children and
+ *   are mocked in tests to keep test scope constrained to screen behavior.
+ * - This screen does not assume any DB/state shape beyond
+ *   `state.auth.user` and `state.alerts.{alerts,globalHazards}` slices.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 import {
     View,

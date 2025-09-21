@@ -1,3 +1,37 @@
+// src/screens/Chat/AddPeopleScreen.js
+/**
+ * AddPeopleScreen.js
+ *
+ * Purpose:
+ * Screen to search and select users to (a) start a direct message, (b) create a
+ * new group chat, or (c) add users to an existing group (when `chatId` + `mode='addToGroup'`).
+ *
+ * Key Responsibilities:
+ * - **Bootstrap**: On mount, dispatches `fetchUserSuggestions('')` then `clearDraftGroupUsers()`.
+ * - **Search (debounced)**: Updates suggestions 300ms after `searchQuery` changes.
+ * - **Selection**: Tap user to toggle (add/remove) via `addUserToDraftGroup` / `removeUserFromDraftGroup`.
+ *   Quick actions: "Select All" (adds all filtered users) and "Clear All".
+ * - **Submit Flow**:
+ *   - If `chatId` and `mode==='addToGroup'`: dispatch `addUserToExistingGroup({chatId, userIds})`,
+ *     then navigate to `ChatRoom` with that `chatId`.
+ *   - If exactly 1 selected: `startDirectMessage(otherUserId)` and navigate using returned `chat_id`.
+ *   - If 2+ selected: open `ConfirmationModal` to capture `groupName`,
+ *     then `createGroupChat({ name: trimmedGroupName, userIds })` and navigate using returned `chat_id`.
+ * - **Fonts/UX**: Waits for Poppins fonts; shows loading indicator until ready.
+ * - **Layout**: Safe-area aware header; `SearchBar`, actions row, selected chips, suggestions list,
+ *   and a floating primary button that adapts label based on selection/context.
+ *
+ * Store Contracts:
+ * - Reads `theme.themeColors` and `chat` slice (`allUsers`, `draftGroupUsers`, `loading`).
+ * - Dispatches actions from `chatActions`.
+ *
+ * Notes:
+ * - Effects may fire twice in Strict Mode; tests assert "called" not exact counts.
+ * - The screen renders `ConfirmationModal` only when creating a group (2+ users selected and no `chatId`).
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useEffect, useState, useRef } from 'react';
 import {
     View,

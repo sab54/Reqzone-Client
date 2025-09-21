@@ -1,3 +1,37 @@
+// src/store/reducers/emergencyReducer.js
+/**
+ * emergencyReducer.js
+ *
+ * Manages emergency contact settings and the contact list.
+ *
+ * State:
+ * - `countryCode`: ISO country code for default emergency numbers
+ * - `customName` / `customNumber`: user-defined fallback contact
+ * - `contacts`: array of emergency contacts (id, name, number, ...)
+ * - `loading`: async flag for fetching contacts
+ * - `error`: last error message, if any
+ *
+ * Local reducers:
+ * - `setCountryCode(code)` / `setCustomName(name)` / `setCustomNumber(number)`
+ * - `setEmergencySettings({ countryCode, customName, customNumber })`
+ * - `setContacts(list)` → replace contacts
+ * - `addContact(contact)` / `removeContact(id)` → local list edits
+ * - `setContactsLoading()` → set loading=true, clear error
+ * - `setContactsError(msg)` → set loading=false, set error
+ *
+ * Thunks (extra reducers):
+ * - `fetchEmergencyContacts` (pending/fulfilled/rejected)
+ *   - pending → loading=true, error=null
+ *   - fulfilled → replace contacts, loading=false, error=null
+ *   - rejected → loading=false, set error (defaults to generic string)
+ * - `addEmergencyContact.fulfilled` → unshift new contact
+ * - `deleteEmergencyContact.fulfilled` → remove contact by id
+ *
+ * Notes:
+ * - Only the fetch flow toggles `loading` automatically; others rely on local setters if needed.
+ * - Insert order for new contacts is newest-first due to `unshift`.
+ */
+
 import { createSlice } from '@reduxjs/toolkit';
 import {
     fetchEmergencyContacts,

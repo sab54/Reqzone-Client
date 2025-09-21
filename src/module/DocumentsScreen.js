@@ -1,3 +1,52 @@
+// src/module/DocumentsScreen.js
+/**
+ * DocumentsScreen.js
+ *
+ * Displays a categorized, searchable, and swipe-actionable list of documents.
+ * Fetches paginated documents from the store, filters them by category and search
+ * text, and exposes per-item actions like open, mark as read, and mark as unread.
+ *
+ * Key functionalities:
+ * - **Fetching & Pagination**
+ *   - On mount / category change: dispatches `fetchDocuments(selectedCategory, 1)`.
+ *   - Supports "load more" by incrementing `page` and fetching the next slice when `hasMore`.
+ *
+ * - **Filtering**
+ *   - Text search: case-insensitive match on `doc.title`.
+ *   - Category filter: `All`, `Flood`, `Earthquake`, `Fire`, `Tsunami`, `Storm`, `Local`.
+ *
+ * - **Swipe Actions**
+ *   - Right actions rendered via `<SwipeActions/>`:
+ *     - **Open Document** → `Linking.openURL(doc.file_url)`.
+ *     - **Mark Read / Unread** → dispatches `markDocumentAsRead` / `markDocumentAsUnread`.
+ *   - Keeps only one open swipeable item at a time (managed with `swipeableRefs`).
+ *
+ * - **UI Components**
+ *   - `<SearchBar/>` for debounceable search input.
+ *   - `<HorizontalSelector/>` for categories with icons.
+ *   - `<SwipeableList/>` to render and paginate document rows.
+ *   - `<ConfirmationModal/>` reserved for future destructive flows (wired via `modalProps`).
+ *
+ * - **Rendering**
+ *   - Each row shows:
+ *     - Unread dot (hidden when `doc.read` is true).
+ *     - Title (truncated via `truncate`), with reduced opacity if read.
+ *     - Relative time (via `formatTimeAgo(doc.uploaded_at)`).
+ *
+ * Data flow:
+ * 1. Category is selected → resets `page` to 1 and fetches first page.
+ * 2. Search query updates → list is filtered locally (no refetch).
+ * 3. "Load more" → increments `page` and fetches subsequent page while `hasMore` is true.
+ * 4. Swipe actions → dispatch the corresponding thunk and close the swipe item.
+ *
+ * Notes:
+ * - `documents`, `loading`, and `hasMore` come from `state.documents`.
+ * - Uses `Linking.openURL` to open document URLs; ensure these are https/file schemes.
+ * - The component is themable—colors and surfaces come from the `theme` prop.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 import {
     Text,

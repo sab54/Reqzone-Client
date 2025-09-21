@@ -1,3 +1,33 @@
+/**
+ * TaskStatsCard.js
+ *
+ * A compact summary card showing the user’s task progress and profile stats.
+ * Displays level, XP, badge count, and a completed/total tasks fraction.
+ *
+ * Key functionalities:
+ * - **Static Summary UI**: Renders a title and a single row of stat items.
+ * - **Theming**: Accepts a `theme` object to customize colors for the card,
+ *   title, and text. Falls back to sensible defaults when not provided.
+ *
+ * Props:
+ * - `level` (number): Current level of the user.
+ * - `xp` (number): Total experience points earned.
+ * - `badgeCount` (number): Number of badges unlocked.
+ * - `totalTasks` (number): Total tasks available.
+ * - `completedTasks` (number): Tasks completed by the user.
+ * - `theme` (object, optional):
+ *     - `card`  (string): Background color of the card. Default: `#fff`
+ *     - `title` (string): Color for the heading text. Default: `#000`
+ *     - `text`  (string): Color for items in the row. Default: `#333`
+ *
+ * Layout:
+ * - Title "📊 Your Stats" on top.
+ * - A single row (`flexDirection: 'row'`, `justifyContent: 'space-between'`, `flexWrap: 'wrap'`)
+ *   containing: Level, XP, Badges, Tasks (completed/total).
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 

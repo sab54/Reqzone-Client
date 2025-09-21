@@ -1,3 +1,42 @@
+// src/store/actions/chatActions.js
+/**
+ * chatActions.js
+ *
+ * Redux Toolkit async thunks for chat features:
+ * - Fetch active chats, user suggestions, and specific chat/message data
+ * - Create direct/group chats, add/remove members, join local groups, delete chats
+ * - Send messages and flush queued messages on reconnect
+ * - Mark chats as read
+ * - Local-only draft group helpers (add/remove/clear)
+ *
+ * Key Thunks:
+ * - **fetchActiveChats()**: Gets current user's chat list (`GET /chat/list/:userId`).
+ * - **fetchUserSuggestions(search)**: Suggests users excluding the current user (`GET /users/suggestions?search=...`).
+ * - **startDirectMessage(otherUserId)**: Creates/returns a DM (`POST /chat/create`).
+ * - **createGroupChat({ name, userIds })**: Creates a group (`POST /chat/create`).
+ * - **addUserToExistingGroup({ chatId, userIds })**: Adds members (`POST /chat/:id/add-members`).
+ * - **removeUserFromGroup({ chatId, userId })**: Removes a member (`DELETE /chat/:id/remove-member`).
+ * - **joinLocalGroup({ latitude, longitude, address, hasAddress })**: Joins/creates a local group (`POST /chat/local-groups/join`) and refreshes active chats.
+ * - **deleteChat(chatId)**: Deletes a chat (`DELETE /chat/:id`).
+ * - **fetchChatById(chatId)**: Gets a single chat (`GET /chat/:id`).
+ * - **fetchMessages(chatId)**: Loads messages (`GET /chat/:id/messages`).
+ * - **sendMessage({ chatId, senderId, message, message_type })**: Sends a message (`POST /chat/:id/messages`).
+ * - **flushQueuedMessages(chatId)**: Retries queued messages (dispatches `appendMessage` for each, then `clearQueuedMessages`).
+ * - **markChatAsReadThunk({ chatId, messageId })**: Marks as read (`POST /chat/read`).
+ * - **addUserToDraftGroup(user)** / **removeUserFromDraftGroup(userId)** / **clearDraftGroupUsers()**: Local-only helpers.
+ *
+ * Error Handling:
+ * - All thunks surface failures via `rejectWithValue(error.message || '<fallback>')`.
+ * - Parameter validation errors (e.g., missing IDs) are thrown and caught into `rejectWithValue`.
+ *
+ * Integration Points:
+ * - API helpers: `get`, `post`, `del` (utils/api)
+ * - URL constants: `API_URL_CHAT`, `API_URL_USERS` (utils/apiPaths)
+ * - Local actions (from reducers/chatReducer): `appendMessage`, `clearQueuedMessages`
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { API_URL_CHAT, API_URL_USERS } from '../../utils/apiPaths.js';
 import { get, post, del } from '../../utils/api';

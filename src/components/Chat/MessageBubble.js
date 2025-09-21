@@ -1,3 +1,51 @@
+/**
+ * MessageBubble.js
+ *
+ * A chat bubble component that renders text, location previews, polls, and quiz prompts
+ * with reactions and timestamp. It supports a long-press action sheet (Reply / Copy / React / Delete)
+ * with light haptic feedback and platform-aware link handling.
+ *
+ * Key functionalities:
+ * - **Sender Awareness**:
+ *   - Bubbles from the current user (`isMe`) align to the right and use `theme.primary`.
+ *   - Others align left and use `theme.surface`. Non-self messages show the sender’s name.
+ *
+ * - **Content Types**:
+ *   - `"location"`: Parses `message.content` as `{latitude, longitude}` (loose JSON), shows a map preview image,
+ *     and opens Apple Maps (iOS) or geo URI (Android) on press.
+ *   - `"quiz"`: Extracts `[quizId:ID]` from `message.content` and shows a "Take Quiz" button that navigates to
+ *     `Quiz` screen with `{ quizId }`.
+ *   - Polls: When `message.type === 'poll' && message.poll`, renders question + tappable options; tapping fires a UI-only alert.
+ *   - Default: Renders `message.content` or `[No content]`.
+ *
+ * - **Reactions & Time**:
+ *   - Renders a row of emoji reactions from `message.reactions`.
+ *   - Timestamp uses `formatTime(message.timestamp)`.
+ *
+ * - **Long-Press Actions**:
+ *   - Haptics: `Haptics.impactAsync(Medium)`.
+ *   - Modal actions: Reply, Copy (via `Clipboard.setString`), React (UI-only), and Delete (only when sent by `isMe`).
+ *
+ * Props:
+ * - `senderId` (string | number): Current user’s id to compute `isMe`.
+ * - `message` (object):
+ *     - `sender?: { id, name }`
+ *     - `content?: string`
+ *     - `timestamp?: number|string|Date`
+ *     - `message_type?: 'location' | 'quiz' | ...`
+ *     - `type?: 'poll' | ...`
+ *     - `poll?: { question: string, options: string[] }`
+ *     - `reactions?: Array<{ emoji: string }>`
+ * - `theme` (object): { primary, surface, text, mutedText, accent, link }
+ * - `openThread` (function): (not used currently)
+ *
+ * Notes:
+ * - Location content parsing tolerates unquoted keys and converts to JSON.
+ * - Delete/React/Reply are UI-only alerts in this component.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useState } from 'react';
 import {
     View,

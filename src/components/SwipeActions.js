@@ -1,3 +1,40 @@
+// components/SwipeActions.js
+/**
+ * SwipeActions
+ *
+ * A right-side swipe action rail for list items (e.g., news articles). As the user drags
+ * the row to the left, this component animates into view and exposes a set of configurable
+ * actions (e.g., "Open", "Add Bookmark"). Each action renders an icon + label and invokes
+ * a callback when pressed.
+ *
+ * Key functionalities:
+ * - **Animated Reveal**: Uses the provided `dragX` animated value to interpolate both
+ *   horizontal translation (translateX) and opacity, clamped between -180 and 0.
+ * - **Configurable Actions**: Renders the supplied `actions` array (type/label/icon/color),
+ *   defaulting to "open" and "bookmark". Pressing an action calls `onAction(type, article, index)`.
+ * - **Bookmark Awareness**: If the `bookmark` action is present, its appearance changes
+ *   based on the `isBookmarked` flag:
+ *   - Icon switches between `"bookmark-outline"` and `"bookmark"`.
+ *   - Label switches between `"Add\nBookmark"` and `"Remove\nBookmark"`.
+ *   - Background color switches between `theme.success`/action color and `theme.error`.
+ *
+ * Animation Flow:
+ * 1. `translateX` is interpolated from `dragX` in the range [-180, 0] → [0, 180].
+ * 2. `opacity` is interpolated from `dragX` in the range [-180, -90, 0] → [1, 0.5, 0].
+ * 3. The animated container shifts and fades as the user swipes.
+ *
+ * Notes:
+ * - Colors default to sane values if the `theme` object omits them:
+ *   - primary: '#3498db'
+ *   - success: '#27ae60'
+ *   - error:   '#e74c3c'
+ *   - buttonPrimaryText: '#fff'
+ * - The `actions` array can include any custom `type`, `label`, `icon`, and `color`.
+ * - Intended for use in swipeable list rows; works well with gesture/Swipeable wrappers.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React from 'react';
 import { TouchableOpacity, Text, Animated, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

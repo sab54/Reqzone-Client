@@ -1,3 +1,44 @@
+/**
+ * TasksScreen.js
+ *
+ * This screen displays tasks, quizzes, and checklists for the user, allowing them to
+ * complete items, track progress, and earn XP and badges.
+ *
+ * Key functionalities:
+ * - **Data Fetching & Refresh**:
+ *   - On focus, dispatches actions to fetch tasks, quizzes, progress, dashboard stats, and user badges.
+ *   - Supports pull-to-refresh and infinite pagination (20 items per page).
+ *
+ * - **Item Handling**:
+ *   - Combines tasks, quizzes, and checklist items into a single list.
+ *   - Provides filtering by tabs (`all`, `checklist`, `quiz`) and text search.
+ *   - Sorting ensures incomplete items are shown before completed ones, then ordered by recency.
+ *   - Supports swipe actions:
+ *     - Tasks: toggle complete/uncomplete.
+ *     - Quizzes: navigate to quiz if not yet completed.
+ *
+ * - **Progress & Leveling**:
+ *   - Computes overall progress across tasks and quizzes.
+ *   - Displays XP, level, and earned badges.
+ *   - When user levels up, shows confetti and an animated LevelUpToast.
+ *
+ * - **UI Composition**:
+ *   - `SearchBar`: query filter.
+ *   - `TipBanner`: motivational banner.
+ *   - `ProgressBar`: progress display with XP and level.
+ *   - `Tabs`: for switching between task/quiz filters.
+ *   - `SwipeableList`: scrollable list with swipe actions.
+ *   - `Footer`: persistent bottom navigation.
+ *   - `LevelUpToast` + `ConfettiCannon`: celebratory effects.
+ *
+ * Notes:
+ * - Uses `useFocusEffect` to re-fetch whenever screen regains focus.
+ * - Relies heavily on Redux selectors with `shallowEqual` to minimize re-renders.
+ * - Applies theme-based styles for full theming support.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, {
     useEffect,
     useState,

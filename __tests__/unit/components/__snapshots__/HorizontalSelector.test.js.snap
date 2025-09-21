@@ -1,0 +1,200 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HorizontalSelector matches snapshot 1`] = `
+<RCTScrollView
+  contentContainerStyle={
+    {
+      "flexDirection": "row",
+      "paddingBottom": 8,
+    }
+  }
+  horizontal={true}
+  showsHorizontalScrollIndicator={false}
+>
+  <View>
+    <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#0044ff",
+          "borderColor": "#cccccc",
+          "borderRadius": 20,
+          "borderWidth": 1,
+          "flexDirection": "row",
+          "marginRight": 8,
+          "opacity": 1,
+          "paddingHorizontal": 12,
+          "paddingVertical": 6,
+        }
+      }
+    >
+      <Text
+        style={
+          [
+            {
+              "fontFamily": "Poppins",
+              "fontSize": 14,
+              "marginLeft": 6,
+            },
+            {
+              "color": "#ffffff",
+              "fontWeight": "600",
+            },
+          ]
+        }
+      >
+        One
+      </Text>
+    </View>
+    <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#eeeeee",
+          "borderColor": "#cccccc",
+          "borderRadius": 20,
+          "borderWidth": 1,
+          "flexDirection": "row",
+          "marginRight": 8,
+          "opacity": 1,
+          "paddingHorizontal": 12,
+          "paddingVertical": 6,
+        }
+      }
+    >
+      <Text
+        style={
+          [
+            {
+              "fontFamily": "Poppins",
+              "fontSize": 14,
+              "marginLeft": 6,
+            },
+            {
+              "color": "#111111",
+              "fontWeight": "500",
+            },
+          ]
+        }
+      >
+        Two
+      </Text>
+    </View>
+    <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#eeeeee",
+          "borderColor": "#cccccc",
+          "borderRadius": 20,
+          "borderWidth": 1,
+          "flexDirection": "row",
+          "marginRight": 8,
+          "opacity": 1,
+          "paddingHorizontal": 12,
+          "paddingVertical": 6,
+        }
+      }
+    >
+      <Text
+        style={
+          [
+            {
+              "fontFamily": "Poppins",
+              "fontSize": 14,
+              "marginLeft": 6,
+            },
+            {
+              "color": "#111111",
+              "fontWeight": "500",
+            },
+          ]
+        }
+      >
+        Three
+      </Text>
+    </View>
+  </View>
+</RCTScrollView>
+`;

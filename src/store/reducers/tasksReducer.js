@@ -1,3 +1,30 @@
+// src/store/reducers/tasksReducer.js
+/**
+ * tasksReducer.js
+ *
+ * Manages daily/weekly tasks, their completion state, and progress tracking.
+ *
+ * State:
+ * - `tasks`: array of task objects
+ * - `completedTaskIds`: array of task IDs the user has completed
+ * - `loading`: true while any async operation is in-flight
+ * - `error`: error string if a request failed
+ * - `lastCompleted`: the last task object marked completed
+ *
+ * Reducers:
+ * - `clearTaskStatus` → resets `lastCompleted` and clears `error`
+ *
+ * Extra reducers:
+ * - `fetchTasks` → pending/fulfilled/rejected: loads available tasks
+ * - `fetchTaskProgress` → pending/fulfilled/rejected: loads completed tasks by ID
+ * - `completeTask` → pending/fulfilled/rejected: adds task ID to `completedTaskIds` if not already, sets `lastCompleted`
+ * - `uncompleteTask` → pending/fulfilled/rejected: removes task ID from `completedTaskIds`
+ *
+ * Notes:
+ * - Duplicate task completions are ignored (`completedTaskIds` remains unique).
+ * - Both `completeTask` and `uncompleteTask` also toggle `loading` and set `error` on rejection.
+ */
+
 import { createSlice } from '@reduxjs/toolkit';
 import {
     fetchTasks,

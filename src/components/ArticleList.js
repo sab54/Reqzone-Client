@@ -1,3 +1,55 @@
+/**
+ * ArticleList.js
+ *
+ * A paginated, filterable, and sortable list for article cards with primary/secondary actions.
+ * Designed for lightweight feeds (default page size = 6) and theming via a provided `theme` object.
+ *
+ * Key functionalities:
+ * - Filtering: by `filterCategory` (string match, case-insensitive) and `searchQuery` (title + description).
+ * - Sorting: by `sortMode`:
+ *    - 'recent' (default): descending by `bookmarkedAt` (if present) then `publishedAt`.
+ *    - 'az': ascending by article `title`.
+ * - Pagination: shows `PAGE_SIZE` items, with "Load More" to append the next page and auto-scroll to bottom.
+ * - Actions: per-item primary/secondary buttons (icons + labels). Primary defaults to `Linking.openURL(item.url)`.
+ * - Empty State: customizable empty text, with optional "Explore Articles" suggestion callback.
+ * - Footer: shows "Showing X of Y" counter and either a loader or a "Load More" button when more items exist.
+ *
+ * Props:
+ * - articles: Array<{ title, description?, url, category?, publishedAt?, bookmarkedAt? }>
+ * - theme: {
+ *     card, border, icon, title, text, mutedText, link,
+ *     buttonPrimaryText, buttonSecondaryText
+ *   }  // used for colors/visuals only
+ * - icon: Ionicon name for each row (default 'newspaper-outline')
+ * - iconColor: overrides `theme.icon` if provided
+ * - emptyText: string shown when list is empty (default 'No articles found.')
+ * - onPrimaryAction(item): optional handler; falls back to `Linking.openURL(item.url)`
+ * - onSecondaryAction(item): optional handler to show secondary CTA when present
+ * - primaryLabel / secondaryLabel: button labels (default 'Open' / 'Action')
+ * - primaryIcon / secondaryIcon: Ionicon names for the buttons
+ * - primaryColor / secondaryColor: optional overrides for button text/icon color
+ * - filterCategory: string category filter (default 'All' - no filter)
+ * - searchQuery: free text search across title + description
+ * - sortMode: 'recent' | 'az' (default 'recent')
+ * - onSuggestBookmark: optional callback rendered in empty state as "Explore Articles"
+ *
+ * Rendering flow:
+ * 1) useMemo -> filter by category/search, then sort by chosen `sortMode`.
+ * 2) Derive visible slice (`visibleCount`) and render via FlatList.
+ * 3) Footer shows count + "Load More" or loading spinner (while simulating async with setTimeout).
+ * 4) Row actions render Ionicons + labels; press handlers call the provided callbacks (or open URL).
+ *
+ * Performance notes:
+ * - Filtering/sorting is memoized on [articles, filterCategory, searchQuery, sortMode].
+ * - Pagination avoids rendering very long lists up front.
+ *
+ * Accessibility:
+ * - Buttons are touch targets with icon + text.
+ * - Footer counter indicates current/total items.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useRef, useMemo, useState } from 'react';
 import {
     View,

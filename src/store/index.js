@@ -1,3 +1,49 @@
+
+// src/store/index.js
+/**
+ * index.js (Redux Store Configuration)
+ *
+ * This file defines and configures the Redux store for the application.
+ * It centralizes all feature reducers, applies middleware, and sets up
+ * Redux DevTools support for debugging in development.
+ *
+ * Key Responsibilities:
+ * - **Reducer Composition**: Combines all slice reducers into a single `rootReducer`.
+ * - **Middleware Setup**: Applies Redux Toolkit's default middleware with
+ *   `serializableCheck` disabled (required for socket objects and custom functions).
+ * - **DevTools Integration**: Enables Redux DevTools extension only in
+ *   development mode for easier debugging.
+ *
+ * Store Structure (state tree):
+ * - **Auth**:
+ *   - `auth` → loginReducer
+ *   - `registration` → registrationReducer
+ * - **UI**:
+ *   - `theme` → themeReducer
+ * - **Features**:
+ *   - `chat` → chatReducer
+ *   - `weather` → weatherReducer
+ *   - `news` → newsReducer
+ *   - `bookmarks` → bookmarksReducer
+ *   - `documents` → documentsReducer
+ *   - `alerts` → alertsReducer
+ *   - `emergency` → emergencyReducer
+ *   - `gamification` → gamificationReducer
+ * - **Games**:
+ *   - `quizzes` → quizzesReducer
+ *   - `tasks` → tasksReducer
+ *   - `badges` → badgesReducer
+ *   - `dashboard` → dashboardReducer
+ *   - `leaderboard` → leaderboardReducer
+ *
+ * Notes:
+ * - This store is the single source of truth for all global application state.
+ * - All reducers should be pure functions and only respond to their slice of the state.
+ * - New feature slices must be imported and added to `rootReducer`.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 
 // Auth-related reducers

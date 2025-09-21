@@ -1,3 +1,37 @@
+// src/store/reducers/quizzesReducer.js
+/**
+ * quizzesReducer.js
+ *
+ * Manages quiz-related state, including available quizzes, the current quiz,
+ * submissions, history, and statistics.
+ *
+ * State:
+ * - `quizzes`: list of quizzes
+ * - `quiz`: currently selected quiz (via `getQuizById`)
+ * - `submissionResult`: last submission result
+ * - `quizHistory`: past quizzes taken
+ * - `quizStats`: aggregated quiz statistics
+ * - `loading`: general async flag (fetching lists, submitting, etc.)
+ * - `isLoadingQuiz`: separate flag for fetching a single quiz
+ * - `error`: last error, if any
+ *
+ * Reducers:
+ * - `clearQuizState` → resets `quiz`, `submissionResult`, and `error`
+ * - `clearQuizSubmissionResult` → resets only `submissionResult`
+ *
+ * Extra reducers:
+ * - `fetchQuizzes` → pending/fulfilled/rejected: loads quizzes list
+ * - `getQuizById` → pending/fulfilled/rejected: loads single quiz (`isLoadingQuiz`)
+ * - `submitQuiz` → pending/fulfilled/rejected: handles quiz submission results
+ * - `fetchQuizHistory` → pending/fulfilled/rejected: loads quiz history
+ * - `fetchQuizStats` → pending/fulfilled/rejected: loads statistics
+ * - `generateQuizAI` → pending/fulfilled/rejected: creates a new quiz and prepends to list
+ *
+ * Notes:
+ * - `loading` and `isLoadingQuiz` are tracked separately for smoother UX.
+ * - `generateQuizAI.fulfilled` unshifts into `quizzes` for immediate availability.
+ */
+
 import { createSlice } from '@reduxjs/toolkit';
 import {
     fetchQuizzes,

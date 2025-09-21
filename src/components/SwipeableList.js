@@ -1,3 +1,53 @@
+// Client/src/components/SwipeableList.js
+/**
+ * SwipeableList
+ *
+ * A forwardRef-enabled, swipeable, paginated list for React Native. Each row is wrapped
+ * in `react-native-gesture-handler`'s `Swipeable` so you can render right-side actions
+ * (e.g., delete buttons). The component also supports empty/loading states, "Load More"
+ * pagination, pull-to-refresh, and safe key extraction.
+ *
+ * Key functionalities:
+ * - **Swipe Actions**: Per-row `Swipeable` with `renderRightActions(progress, dragX)` and
+ *   `onSwipeableWillOpen` hook to let the parent know when a swipe begins (`handleSwipeStart`).
+ * - **Tap vs. Swipe Guard**: Row presses are ignored while a swipe is in progress
+ *   using an internal `isSwipingRef`; it resets shortly after a tap attempt.
+ * - **Pagination Footer**: Shows total/visible counts. When `hasMore` is true:
+ *   - Shows spinner while `loading` is true.
+ *   - Shows a "Load More" button when not loading; pressing triggers `onLoadMore()`,
+ *     then auto-scrolls to bottom via `ref.current?.scrollToEnd()` after 300ms.
+ * - **Empty State**: When not `loading` and there’s no data, shows `emptyText`.
+ * - **Icons & Theming**: Optional leading icon (`Ionicons`) and theme-driven colors
+ *   (`theme.card`, `theme.text`, `theme.border`, `theme.primary`).
+ * - **Safe Keys**: If `keyExtractor` is not provided, falls back to `item.url`, `item.id`,
+ *   or index-based key.
+ *
+ * Props (selected):
+ * - `data: any[]` — items to render.
+ * - `totalCount: number` — total count across pages.
+ * - `loading: boolean` — fetch-in-progress flag.
+ * - `refreshing: boolean` — pull-to-refresh flag; `onRefresh()` handler.
+ * - `hasMore: boolean` — whether more data can be loaded.
+ * - `disableLoadMore: boolean` — disables "Load More" press & dims button.
+ * - `onLoadMore(): void` — invoked on "Load More" press.
+ * - `renderRightActions(item, index, progress, dragX): React.Node` — right-side swipe UI.
+ * - `renderItemText(item): string | React.Node` — inner text or custom node.
+ * - `renderItemContainer(item, content, onItemPress): React.Node` — fully custom row container.
+ * - `onItemPress(item): void` — row press handler (guarded during swipe).
+ * - `icon: string` — Ionicon name (default `'list-outline'`); `showIcon: boolean`.
+ * - `theme: { text, card, border, primary }` — color tokens.
+ * - `emptyText: string` — message when list is empty.
+ * - `ListHeaderComponent: React.Node` — optional header.
+ * - `swipeableRefs: React.MutableRefObject<Swipeable[]>` — access to row swipeables.
+ *
+ * Notes:
+ * - Exposes the outer `FlatList` ref via `forwardRef` (supports `scrollToEnd`).
+ * - The "Load More" auto-scroll uses a 300ms timeout to let new items mount first.
+ * - `Swipeable` config: `friction=1`, `rightThreshold=20`, `overshootRight=false`.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { forwardRef, useRef } from 'react';
 import {
     ActivityIndicator,

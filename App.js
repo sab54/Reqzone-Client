@@ -1,3 +1,39 @@
+/**
+ * App Entry (Navigation + Providers)
+ *
+ * This module wires up the global providers (Redux, Safe Area, Gesture Handler, Chat context),
+ * boot-time flows (SplashScreen + font loading), navigation containers (stack + tabs),
+ * and user-affecting side-effects (theme load, location tracking, auth redirects).
+ *
+ * Key functionalities:
+ * - **Providers**: Wraps the tree with Redux <Provider>, <SafeAreaProvider>, and <GestureHandlerRootView>.
+ * - **Splash & Fonts**: Blocks UI with SplashScreen until fonts load and initial theme is restored.
+ * - **Navigation**:
+ *   - **Stack**: Auth flow (Login/Registration/OTP) vs. Main app (Tabs + ChatRoom/AddPeople/Quiz/Badges).
+ *   - **Tabs**: Home, Tasks, Alerts, Resources, Chat — with dynamic theming and custom header left profile button.
+ * - **Profile Modal**: Header-left avatar opens a slide-in sidebar with:
+ *   - Theme toggle (Light/Dark) via `applyThemeMode`.
+ *   - Logout via `logout`.
+ * - **Theming**: Reads `{ isDarkMode, themeColors }` from Redux and adapts NavigationContainer theme,
+ *   tab colors, header/tab styles, and sidebar styles.
+ * - **Location Updates**: When authenticated, requests foreground permission and streams location updates
+ *   to Redux via `updateUserLocation`.
+ * - **Auth Redirects**: If user logs out, resets navigation state to Login screen.
+ *
+ * Middleware/Effects Flow:
+ * 1. On mount, restore theme from storage and prevent auto-hiding SplashScreen.
+ * 2. When fonts + splash are ready, hide SplashScreen.
+ * 3. If authenticated, begin location watch; cleanup on unmount or logout.
+ * 4. Header avatar opens a modal; actions inside dispatch Redux state changes.
+ *
+ * Notes:
+ * - Uses semantic theme tokens from `themeColors` (e.g., `text`, `link`, `headerBackground`, `surface`).
+ * - Animations use `Animated.timing` / `spring`; tests run with a tamed Animated mock for stability.
+ * - Vector icons and native modules are mocked in Jest setup for deterministic tests.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import React, { useEffect, useState, useRef } from 'react';

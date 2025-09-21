@@ -1,3 +1,42 @@
+// src/screens/HomeScreen.js
+/**
+ * HomeScreen.js
+ *
+ * Purpose:
+ * A top-level dashboard screen that greets users, shows current weather/forecast,
+ * curates news/bookmarks, and keeps a persistent footer. It also exposes
+ * pull-to-refresh behavior to reload weather data.
+ *
+ * Key Responsibilities:
+ * - **Font Bootstrap**: Uses `expo-font`'s `useFonts` to load "Poppins".
+ *   While fonts load, renders an ActivityIndicator + "Loading fonts...".
+ * - **Data Fetch on Mount**: Dispatches `fetchWeatherData()` and `fetchForecastData()`
+ *   once when the component mounts (React 18 tests may run effects twice).
+ * - **Pull-to-Refresh**: When the user pulls to refresh, re-dispatches both weather
+ *   actions and briefly toggles the FlatList `refreshing` state.
+ * - **Composable Content Blocks**: Renders header, weather card, news/bookmarks,
+ *   optional error block (only if `weather.error` exists), and a footer.
+ * - **Safe Area Insets**: Applies bottom padding via `useSafeAreaInsets()` to avoid
+ *   clipping behind device UI.
+ *
+ * State/Store Contracts:
+ * - Reads `theme.themeColors` for `background`, `primary`, `text`, and `danger`.
+ * - Reads `weather.current`, `weather.forecast`, `weather.loading`, and `weather.error`.
+ * - Relies on `fetchWeatherData` and `fetchForecastData` actions from the weather slice.
+ *
+ * Rendering Guarantees:
+ * - **Loading**: If fonts are not ready, shows a centered loading state.
+ * - **Main Content**: When fonts are ready, always renders `WeatherCard`, `NewsAndBookmarks`,
+ *   and `Footer`. If `weather.error` is present, renders a visible error block:
+ *   "⚠️ Weather fetch failed: <message>".
+ *
+ * Notes:
+ * - This screen is UI/data-layer agnostic: action effects and reducers are not tested here.
+ * - Avoids suggesting code changes; tests are written to the current implementation.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useEffect, useState, useCallback } from 'react';
 import {
     View,

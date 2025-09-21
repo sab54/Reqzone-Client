@@ -1,3 +1,44 @@
+/**
+ * quizzesActions.js
+ *
+ * Redux Toolkit async thunks for quizzes: discovery, retrieval, submission,
+ * history & stats, and AI generation.
+ *
+ * Exports:
+ * - **fetchQuizzes(userId)**
+ *   - GET `${API_URL_QUIZZES}/user/:userId`
+ *   - Returns `response.quizzes || []`
+ *
+ * - **getQuizById(quizId)**
+ *   - GET `${API_URL_QUIZZES}/:quizId`
+ *   - Returns `response.quiz || null`
+ *
+ * - **submitQuiz({ quizId, userId, answers })**
+ *   - POST `${API_URL_QUIZZES}/:quizId/submit` with `{ user_id, answers }`
+ *   - Returns full `response`
+ *
+ * - **fetchQuizHistory(userId)**
+ *   - GET `${API_URL_QUIZZES}/history/:userId`
+ *   - Returns `response.history || []`
+ *
+ * - **fetchQuizStats(quizId)**
+ *   - GET `${API_URL_QUIZZES}/:quizId/stats`
+ *   - Returns `response.stats || {}`
+ *
+ * - **generateQuizAI({ topic, difficulty, createdBy, chatId })**
+ *   - POST `${API_URL_QUIZZES}/ai-generate`
+ *   - Returns `response.quiz`
+ *
+ * Error Handling:
+ * - Each thunk rejects with `error.message` or a user-friendly fallback.
+ *
+ * Dependencies:
+ * - `get`, `post` from `utils/api`
+ * - `API_URL_QUIZZES` from `utils/apiPaths`
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { API_URL_QUIZZES } from '../../utils/apiPaths';
 import { get, post } from '../../utils/api';

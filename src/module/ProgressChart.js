@@ -1,3 +1,39 @@
+/**
+ * ProgressChart.js
+ *
+ * A compact dashboard card that visualizes preparedness progress for multiple
+ * task buckets (e.g., “Go-bag”, “Documents”, “Evac Plan”). Each bucket shows:
+ * - a circular progress indicator (completed/total),
+ * - a priority icon (High/Medium/Low),
+ * - and, when expanded, key task details (due date + description).
+ *
+ * Key functionalities:
+ * - **Progress Calculation**: For each task bucket, computes `progress = completedTasks / totalTasks`
+ *   (0 when total is falsy) and renders a circular indicator with a percentage label.
+ * - **Priority Indicators**:
+ *   - High → `warning` icon, error color
+ *   - Medium → `information-circle` icon, warning color
+ *   - Low (default) → `checkmark-circle` icon, success color
+ * - **Adaptive Colors**: Progress ring color reflects completion level:
+ *   - < 50% → error color
+ *   - < 80% → warning color
+ *   - ≥ 80% → success color
+ * - **Expand/Collapse Details**: Tapping a card toggles additional details (due date & description).
+ *
+ * Props:
+ * - `data: Record<string, { totalTasks: number|string, completedTasks: number|string, priority: 'High'|'Medium'|'Low'|string, dueDate: string, description: string }>`
+ *   A keyed object where each key is the bucket title and the value contains counts and metadata.
+ * - `theme: { card, border, cardShadow, background, surface, title, text, mutedText, error, warning, success }`
+ *   Color palette used across the card, icons, and progress ring.
+ *
+ * UI/UX Notes:
+ * - Uses `react-native-progress` `Circle` for the radial meter with an inline percentage label.
+ * - Layout adapts to screen width: each bucket occupies ~¼ width (wraps to next line on small screens).
+ * - Tapping a bucket toggles a detail panel below the grid without leaving the screen.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useState } from 'react';
 import {
     View,

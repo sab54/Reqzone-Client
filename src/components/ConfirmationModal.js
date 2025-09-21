@@ -1,3 +1,37 @@
+// components/ConfirmationModal.js
+/**
+ * ConfirmationModal.js
+ *
+ * A theme-aware confirmation modal for React Native apps.
+ * Renders an overlayed dialog with title, optional description/children,
+ * and one or two action buttons. The overlay tap (outside card) and the
+ * optional "Cancel" button both dismiss via `onClose`; the primary action
+ * invokes `onConfirm`.
+ *
+ * Key functionalities:
+ * - **Visibility Control**: Uses React Native's `Modal` with `visible` prop.
+ * - **Dismissal**: Overlay press or Cancel button calls `onClose`.
+ * - **Primary Action**: Confirm button calls `onConfirm`.
+ * - **Custom Content**: Optional `description`, `children`, and `Ionicons` icon.
+ * - **Theming**: Colors and styles come from the provided `theme` object.
+ * - **Single vs. Dual Buttons**: Controlled by `multipleButtons` prop.
+ *
+ * Props:
+ * - visible: boolean — controls modal visibility.
+ * - onClose: function — called when modal should close.
+ * - onConfirm: function — called when confirm action is taken.
+ * - title?: string — modal title (default: "Are you sure?").
+ * - description?: string — optional description text.
+ * - confirmLabel?: string — confirm button label (default: "Confirm").
+ * - cancelLabel?: string — cancel button label (default: "Cancel").
+ * - multipleButtons?: boolean — show Cancel button when true (default: true).
+ * - children?: ReactNode — optional custom content inside the modal.
+ * - theme: object — contains overlay/surface/text/button colors.
+ * - icon?: string — Ionicons name for optional header icon.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React from 'react';
 import {
     Modal,

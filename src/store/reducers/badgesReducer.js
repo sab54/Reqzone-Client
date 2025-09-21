@@ -1,3 +1,33 @@
+// src/store/reducers/badgesReducer.js
+/**
+ * badgesReducer.js
+ *
+ * Slice managing all available badges, a user’s earned badges, and badge-awarding state.
+ *
+ * State shape:
+ * - `allBadges`: list of all possible badges
+ * - `userBadges`: badges the user has already earned
+ * - `loading`: async flag for any badge operation
+ * - `error`: last error message, if any
+ * - `lastAwarded`: the most recently awarded badge (object or id)
+ *
+ * Reducers:
+ * - `clearBadgeState` → clears `lastAwarded` and `error` while leaving data intact
+ *
+ * Extra reducers:
+ * - `fetchAllBadges` (pending/fulfilled/rejected)
+ *   - loads master list of badges
+ * - `fetchUserBadges` (pending/fulfilled/rejected)
+ *   - loads the user’s earned badges
+ * - `awardBadgeToUser` (pending/fulfilled/rejected)
+ *   - updates `lastAwarded` on success
+ *
+ * Notes:
+ * - All thunks set `loading` and reset `error` during pending state
+ * - Fulfilled cases replace their respective slices entirely
+ * - Rejected cases store the error message in `error`
+ */
+
 import { createSlice } from '@reduxjs/toolkit';
 import {
     fetchAllBadges,

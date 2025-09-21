@@ -1,3 +1,58 @@
+/**
+ * utils.js
+ *
+ * Collection of utility functions for location services, time formatting,
+ * and text handling within the app.
+ *
+ * Key Functionalities:
+ *
+ * 1. **getUserLocation**
+ *    - Requests foreground location permissions using `expo-location`.
+ *    - If granted, retrieves the user’s current coordinates.
+ *    - Returns `{ latitude, longitude }`.
+ *    - Throws an error if permission is denied.
+ *
+ * 2. **reverseGeocode**
+ *    - Uses the OpenCage Data API to convert latitude/longitude into
+ *      human-readable location data.
+ *    - Extracts `countryCode` (uppercased) and `region` (region/state/county/city).
+ *    - Returns an object:
+ *      ```js
+ *      {
+ *        countryCode: 'US',
+ *        region: 'California',
+ *        ...components, // raw OpenCage components
+ *        hasErrors: false
+ *      }
+ *      ```
+ *    - On error: returns default `{ countryCode: 'GB', region: 'England', hasErrors: true }`.
+ *
+ * 3. **formatTimeAgo**
+ *    - Humanizes the elapsed time since a given date string.
+ *    - Returns:
+ *      - `"X min ago"` if under 1 hour.
+ *      - `"X hr ago"` if under 24 hours.
+ *      - `"X days ago"` otherwise.
+ *
+ * 4. **truncate**
+ *    - Trims text to a specified length (default 50 chars).
+ *    - Prevents cutting mid-word by removing trailing partial words.
+ *    - Appends `"..."` if truncation occurs.
+ *    - Returns empty string if input is invalid or empty.
+ *
+ * 5. **formatTime (default export)**
+ *    - Formats a given date into 12-hour clock format.
+ *    - Returns `"HH:MM AM/PM"`.
+ *    - Returns empty string if date is falsy/invalid.
+ *
+ * Notes:
+ * - Requires `OPENCAGE_API_KEY` defined in `config.js` for reverse geocoding.
+ * - Designed for use in chat, alerts, and location-sensitive features.
+ * - Handles both happy paths and graceful fallbacks on API/permission errors.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import axios from 'axios';
 import * as Location from 'expo-location';
 

@@ -1,3 +1,35 @@
+/**
+ * tasksActions.js
+ *
+ * Redux Toolkit async thunks for checklist tasks and user progress.
+ *
+ * Exports:
+ * - **fetchTasks(userId)**
+ *   - GET `${API_URL_TASKS}/:userId`
+ *   - Returns `response.tasks || []`
+ *
+ * - **fetchTaskProgress(userId)**
+ *   - GET `${API_URL_TASKS}/progress/:userId`
+ *   - Returns `response.completedTasks || []`
+ *
+ * - **completeTask({ userId, taskId })**
+ *   - POST `${API_URL_TASKS}/complete` with `{ user_id, task_id }`
+ *   - Returns `{ taskId, ...response }`
+ *
+ * - **uncompleteTask({ userId, taskId })**
+ *   - POST `${API_URL_TASKS}/uncomplete` with `{ user_id, task_id }`
+ *   - Returns `{ taskId, ...response }`
+ *
+ * Error Handling:
+ * - Each thunk rejects with `error.message` or a friendly fallback string.
+ *
+ * Dependencies:
+ * - `get`, `post` from `utils/api`
+ * - `API_URL_TASKS` from `utils/apiPaths`
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { API_URL_TASKS } from '../../utils/apiPaths';
 import { get, post } from '../../utils/api';

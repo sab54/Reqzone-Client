@@ -1,11 +1,47 @@
 // src/utils/weatherAlerts.js
-//
-// Deterministic, OpenWeather-only alert derivation.
-// Signals used: rain/snow volumes (mm liquid eq), gusts/sustained (m/s), pressure (hPa), humidity (%),
-// visibility (m), temperature (°C), thunderstorm codes (200–232).
-//
-// Each alert: { id, title, description, category, severity, timestamp, url, precaution }
-// SEVERITY ORDER: Advisory < Watch < Warning
+/**
+ * weatherAlerts.js
+ *
+ * Deterministic, OpenWeather-only alert derivation and UX helpers.
+ *
+ * Purpose:
+ * - Convert raw OpenWeather "current" + "forecast (3h steps)" objects into a normalized list
+ *   of actionable alerts (Advisory/Watch/Warning) using conservative, region-agnostic thresholds.
+ * - Provide small presentation helpers for alert icons and calm-state copy.
+ *
+ * Key exports:
+ * - THRESH: Tunable thresholds for wind, pressure, precip, heat/fog/ice, etc. (units: comments inline)
+ * - FLAGS:  Feature toggles (e.g., wildfire risk enablement).
+ * - createConditionBasedAlerts(weatherData, forecastData?)
+ *      -> [{ id, title, description, category, severity, timestamp, url, precaution }]
+ *      Inputs:
+ *        • weatherData: OpenWeather "current" shape (must include { main, weather[0] }).
+ *        • forecastData: Either an OpenWeather "list" array of 3h steps, or the full API object with { list }.
+ *      Behavior:
+ *        • Considers the first ~24 hours via 8 x 3h steps (next24h).
+ *        • Computes 24h sums/max/min for rain/snow/gusts/temp/humidity; evaluates thunder codes (200–232).
+ *        • Emits alerts across categories: Wind, Flood, Snow/Cold (incl. ice, wind chill), Heat, Fog, Storm,
+ *          Wildfire (opt-in), generic Low-Pressure/Unsettled Weather, and an informational seismic disclaimer.
+ *        • Avoids duplicative light precip advisories if heavier alerts were already issued (flood/winter storm).
+ *        • Timestamps are anchored to current observation time (weatherData.dt) to keep ordering stable.
+ *
+ * - getAlertIconName(category)
+ *      -> MaterialCommunityIcons icon name for an alert category (fallback: "alert-circle-outline").
+ *
+ * - getCalmFallbackMessage(weatherData)
+ *      -> Short message string for when no hazardous alerts trigger. Uses weather[0].main classification.
+ *
+ * Units & assumptions:
+ * - Wind/gusts in m/s (converted to km/h for copy), rain/snow are liquid-equivalent mm, visibility meters,
+ *   pressure hPa, humidity %, temperature in °C (OpenWeather metric).
+ *
+ * Notes:
+ * - This module is deterministic and side-effect free (aside from string building for descriptions).
+ * - No I/O; ideal for unit testing and device-offline derivation when API alerts are unavailable.
+ *
+ * Author: ResQZone Team (Sunidhi Abhange et al.)
+ */
+
 
 // ---------------- Tunable thresholds (conservative & region-agnostic) ----------------
 export const THRESH = {

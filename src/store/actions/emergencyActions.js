@@ -1,3 +1,38 @@
+/**
+ * emergencyActions.js
+ *
+ * Redux Toolkit async thunks and local async actions for managing emergency contacts
+ * and local emergency settings.
+ *
+ * Exports:
+ * - **loadEmergencySettings()**
+ *   - Loads emergency settings from AsyncStorage (or uses `mockEmergencySettings` if DEV_MODE).
+ *   - Dispatches `setEmergencySettings`.
+ *
+ * - **saveEmergencySettings(settings)**
+ *   - Persists provided settings into AsyncStorage (or directly dispatches in DEV_MODE).
+ *   - Dispatches `setEmergencySettings`.
+ *
+ * - **fetchEmergencyContacts(userId)**
+ *   - GET `${API_URL_USERS}/emergency-contacts/:userId`.
+ *   - Returns `response.data` array or rejects with error message.
+ *
+ * - **addEmergencyContact({ user_id, name, phone_number })**
+ *   - POST to `${API_URL_USERS}/emergency-contacts`.
+ *   - Returns the contact object `{ user_id, name, phone_number }`.
+ *
+ * - **deleteEmergencyContact(contactId)**
+ *   - DELETE `${API_URL_USERS}/emergency-contacts/:id`.
+ *   - Returns the deleted `contactId`.
+ *
+ * Notes:
+ * - Relies on `AsyncStorage` for persistence.
+ * - Uses `get`, `post`, `del` helpers from `utils/api`.
+ * - Provides consistent `rejectWithValue` error messages for thunk rejections.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setEmergencySettings } from '../reducers/emergencyReducer';

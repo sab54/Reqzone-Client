@@ -1,3 +1,49 @@
+// src/module/ChatList.js
+/**
+ * ChatList.js
+ *
+ * Presents a searchable, tabbed list of chats with swipe actions and pagination.
+ *
+ * Key functionalities:
+ * - Tabs & Search:
+ *   - Tabs: "All", "Groups", "Private".
+ *   - Local search by chat name (case-insensitive).
+ *
+ * - Pagination:
+ *   - Client-side paging with PAGE_SIZE (20). "Load more" appends the next page
+ *     after a short delay to mimic async behavior and avoid rapid state churn.
+ *
+ * - Swipe Actions:
+ *   - Right-side action to delete a chat; opens a confirmation modal before dispatching
+ *     `deleteChat(chatId)`.
+ *   - Keeps only a single swipeable row open at a time.
+ *
+ * - Navigation:
+ *   - Tapping a row navigates to `ChatRoom`, passing `{ chatId }`.
+ *
+ * - Unread Indicator:
+ *   - Shows a small blue dot for chat IDs present in `unreadByChatId`.
+ *
+ * Component flow:
+ * 1. Filter:
+ *    - Filter by tab selection (All/Groups/Private).
+ *    - Filter by `searchQuery` in `chat.name`.
+ * 2. Paginate:
+ *    - Slice the filtered array to `page * PAGE_SIZE`.
+ *    - "Load more" increases `page` via a timed setState.
+ * 3. Render:
+ *    - `SwipeableList` renders rows via `renderItemContainer`, which includes avatar,
+ *      name, last message, relative time (`formatTimeAgo`), and unread dot.
+ *    - A confirmation modal is shown before deletion.
+ *
+ * Notes:
+ * - `SwipeableList`, `Tabs`, `SearchBar`, and `ConfirmationModal` are presentational;
+ *   tests mock them to focus on `ChatList` behavior.
+ * - Navigation is obtained from `useNavigation()`; tests stub it to assert routing.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useRef, useState, useMemo, useEffect, forwardRef } from 'react';
 import {
     View,

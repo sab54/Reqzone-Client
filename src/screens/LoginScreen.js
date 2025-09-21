@@ -1,3 +1,44 @@
+// Client/src/screens/LoginScreen.js
+/**
+ * LoginScreen
+ *
+ * A phone-number based login screen that:
+ * - Focuses the phone input on mount and fades the UI in.
+ * - Remembers the last used country code and phone number via AsyncStorage.
+ * - Lets users pick a country calling code with `react-native-country-codes-picker`.
+ * - Dispatches `requestOtp` to request an OTP and navigates to `OTPVerification`.
+ * - Applies a blur when the keyboard is open and adapts layout with KeyboardAvoidingView.
+ *
+ * Key UI/UX Details:
+ * - **Animated**: initial fade-in (`fadeAnim`) and subtle press scale on submit (`buttonScale`).
+ * - **Validation**: enables submit only when a 10-digit phone number is present.
+ * - **Theming**: colors pulled from `themeColors` in Redux (dark/light aware).
+ * - **Keyboard handling**: dismiss on outside tap; tracks keyboard open state to apply blur.
+ *
+ * State:
+ * - `phoneNumber` (string): numeric-only, max length 10.
+ * - `selectedCountryCode` (string): default '+44'; persisted/restored from AsyncStorage.
+ * - `errorMessage` (string|Error): server/client error surfaced below the input.
+ * - `showCountryPicker` (boolean): toggles country list modal.
+ * - `keyboardOpen` (boolean): true when keyboard is visible (for blur effect).
+ *
+ * Side Effects (useEffect):
+ * - Focus input on mount, load persisted values, start fade-in animation.
+ * - Subscribe to keyboard show/hide to update `keyboardOpen`.
+ *
+ * Actions/Navigation:
+ * - Dispatches `requestOtp({ phone_number, country_code })` then navigates to
+ *   `OTPVerification` with: { phoneNumber, countryCode, userId, otpCode, autoFillOtp }.
+ *
+ * Dependencies:
+ * - Redux: `useSelector`, `useDispatch`
+ * - Navigation: `useNavigation`
+ * - Storage: `@react-native-async-storage/async-storage`
+ * - UI libs: `expo-blur`, `react-native-country-codes-picker`, `Animated`, `ImageBackground`
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import {
     View,

@@ -1,3 +1,32 @@
+// src/screens/Gamification/BadgesScreen.js
+/**
+ * BadgesScreen
+ *
+ * Displays a user's badge collection with lock/unlock state derived from Redux.
+ *
+ * Key functionalities:
+ * - **Static Badge Catalog**: Renders a fixed list of achievement badges (Prepared, Quiz Master, Level Up)
+ *   with a title, description, and Ionicons icon name.
+ * - **Unlock State from Redux**: Reads `state.gamification.badges` (array of badge keys) via `useSelector`
+ *   and marks corresponding cards as unlocked (full opacity, success color, "Unlocked 🎉" label).
+ * - **Locked Presentation**: Badges not in the unlocked array render with reduced opacity,
+ *   border/neutral color, and the "Locked 🔒" label.
+ * - **Theming**: All colors and surface/background values come from the provided `theme` prop
+ *   (e.g., `theme.surface`, `theme.textPrimary`, `theme.success`).
+ *
+ * Render flow:
+ * 1. Compute styles from `getStyles(theme)`.
+ * 2. Render a screen title and a FlatList of `badgeList`.
+ * 3. For each badge, compute `isUnlocked` by checking presence in the Redux `badges` array.
+ * 4. Set icon color, text color, and card opacity based on unlock state.
+ *
+ * Notes:
+ * - This screen assumes `state.gamification.badges` exists and is an array of keys such as "prepared".
+ * - The `theme` prop must supply the keys used in `getStyles` (e.g., background, surface, textPrimary, success, border, iconActive, iconInactive).
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';

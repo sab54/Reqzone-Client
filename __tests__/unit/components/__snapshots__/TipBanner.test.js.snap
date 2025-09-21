@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TipBanner matches snapshot 1`] = `
+<View
+  style={
+    [
+      {
+        "borderRadius": 8,
+        "marginBottom": 15,
+        "padding": 10,
+      },
+      {
+        "backgroundColor": "#f5f5dc",
+      },
+    ]
+  }
+>
+  <Text
+    style={
+      [
+        {
+          "fontFamily": "Poppins",
+          "fontSize": 13,
+        },
+        {
+          "color": "#000",
+        },
+      ]
+    }
+  >
+    💡 
+    Snapshot tip
+  </Text>
+</View>
+`;

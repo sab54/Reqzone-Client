@@ -1,3 +1,37 @@
+// src/screens/SettingsScreen.js
+/**
+ * SettingsScreen.js
+ *
+ * Purpose:
+ * Provides a simple UI for configuring emergency contact details and
+ * default country code. Data is persisted locally via AsyncStorage.
+ *
+ * Key Responsibilities:
+ * - **Load Settings**: On mount, loads `emergencyContactName`,
+ *   `emergencyContactNumber`, and `emergencyCountry` from AsyncStorage and
+ *   initializes component state.
+ * - **Save Settings**: When "Save Settings" pressed, saves current form
+ *   values to AsyncStorage and shows a confirmation `Alert`.
+ * - **Default Emergency Numbers**: Shows the default emergency number for
+ *   the selected `countryCode` (fallback is "911").
+ *
+ * Inputs:
+ * - `theme`: Theme object from Redux or parent, providing `background`,
+ *   `title`, `text`.
+ *
+ * State:
+ * - `contactName`: Emergency contact’s name (string).
+ * - `contactNumber`: Emergency contact’s number (string).
+ * - `countryCode`: ISO country code (string, e.g., "US").
+ *
+ * Notes:
+ * - Uses controlled TextInputs with placeholders.
+ * - `Alert.alert` is used for persistence confirmation.
+ * - Uses Poppins font family for consistent styling.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useState, useEffect } from 'react';
 import {
     View,

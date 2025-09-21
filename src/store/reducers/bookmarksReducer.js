@@ -1,3 +1,34 @@
+// src/store/reducers/bookmarksReducer.js
+/**
+ * bookmarksReducer.js
+ *
+ * Manages a simple bookmark list with async load/add/remove/clear flows.
+ *
+ * State:
+ * - `bookmarks`: array of bookmark objects (shape defined by callers)
+ * - `loading`: true while `loadBookmarks` is pending
+ * - `error`: last error message, if any
+ *
+ * Extra reducers:
+ * - `loadBookmarks` (pending/fulfilled/rejected)
+ *   - pending: sets `loading=true`, clears `error`
+ *   - fulfilled: replaces `bookmarks` with payload if it's an array, else []
+ *   - rejected: stores error in `error`, sets `loading=false`
+ * - `addBookmark` (fulfilled/rejected)
+ *   - fulfilled: unshifts new item at the start of `bookmarks`
+ *   - rejected: stores error
+ * - `removeBookmark` (fulfilled/rejected)
+ *   - fulfilled: filters out item whose `url` matches payload
+ *   - rejected: stores error
+ * - `clearBookmarksAndPersist` (fulfilled/rejected)
+ *   - fulfilled: empties `bookmarks`
+ *   - rejected: stores error
+ *
+ * Notes:
+ * - Only `loadBookmarks` toggles `loading`; others do not change it.
+ * - Replacements are non-merging; list order is preserved except `add` which unshifts.
+ */
+
 import { createSlice } from '@reduxjs/toolkit';
 import {
     loadBookmarks,

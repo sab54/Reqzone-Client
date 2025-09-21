@@ -1,3 +1,67 @@
+// src/module/EmergencyShortcuts.js
+/**
+ * EmergencyShortcuts.js
+ *
+ * Provides quick-access cards for contacting emergency services (Police, Fire,
+ * Medical) and user-defined emergency contacts. Each service card supports
+ * calling, locating nearby facilities, and sending preset SMS messages (with
+ * optional live location).
+ *
+ * Key functionalities:
+ * - **Emergency Number Detection**:
+ *   - Determines the default dial number dynamically based on network status,
+ *     geolocation, and country code via `expo-network`, `expo-location`, and
+ *     `expo-localization`.
+ *   - Falls back to region defaults (e.g., US: 911, UK: 999, IN: 112).
+ *
+ * - **Emergency Service Cards**:
+ *   - Three predefined services: Police, Fire, and Medical.
+ *   - Expand/collapse to show service description and actions.
+ *   - Actions:
+ *     - **Call**: Opens the system dialer with the default emergency number.
+ *     - **Locate**: Opens Apple Maps (iOS) or Google Maps (Android) with
+ *       facility queries.
+ *     - **Text**: Opens modal with preset SMS messages or “📍 Send My Location”.
+ *
+ * - **Custom Emergency Contacts**:
+ *   - Pulled from Redux state (`state.emergency.contacts`) via
+ *     `fetchEmergencyContacts`.
+ *   - Long-press on a contact shows a `ConfirmationModal` to remove.
+ *   - “Add Another Emergency Contact” opens an `AddContactModal` where users
+ *     can save new contacts (via `addEmergencyContact`).
+ *
+ * - **Messaging & Location**:
+ *   - SMS composition via `Linking.openURL('sms:...')`.
+ *   - Location sharing builds a Google Maps link with live coordinates.
+ *
+ * - **Animations**:
+ *   - Uses `LayoutAnimation` for card expand/collapse transitions.
+ *   - Pulsing animation (`Animated.loop`) applied to the call button for visual
+ *     emphasis.
+ *
+ * Data flow:
+ * 1. On mount:
+ *    - Starts pulsing animation.
+ *    - Dispatches `fetchEmergencyContacts(user.id)` if user exists.
+ *    - Runs `determineEmergencyNumber` to set default number.
+ * 2. User interactions:
+ *    - Expanding a card reveals actions.
+ *    - Call → opens dialer.
+ *    - Locate → opens maps.
+ *    - Text → opens modal with preset SMS/location.
+ *    - Add → saves new contact & refetches list.
+ *    - Long-press contact → confirms and deletes.
+ *
+ * Notes:
+ * - Uses Redux thunks (`fetchEmergencyContacts`, `addEmergencyContact`,
+ *   `deleteEmergencyContact`) with `.unwrap()` for error handling.
+ * - Designed to be fully theme-aware (colors, backgrounds, text styles pulled
+ *   from `theme` prop).
+ * - Tested with mocks for Linking, Location, Network, and Localization.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useEffect, useState } from 'react';
 import {
     View,

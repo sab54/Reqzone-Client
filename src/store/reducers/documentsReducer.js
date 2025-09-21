@@ -1,3 +1,38 @@
+// src/store/reducers/documentsReducer.js
+/**
+ * documentsReducer.js
+ *
+ * Manages a list of user documents with async load/add/remove/clear flows
+ * and read/unread toggles.
+ *
+ * State:
+ * - `documents`: array of document objects (id, url, title, read, ...)
+ * - `loading`: true while `fetchDocuments` is pending
+ * - `error`: last error string, if any
+ *
+ * Extra reducers:
+ * - `fetchDocuments` (pending/fulfilled/rejected)
+ *   - pending: `loading=true`, `error=null`
+ *   - fulfilled: replaces `documents` with payload if Array, else []
+ *   - rejected: `loading=false`, set `error`
+ * - `addDocument` (fulfilled/rejected)
+ *   - fulfilled: unshifts new doc to the front
+ *   - rejected: set `error`
+ * - `removeDocument` (fulfilled/rejected)
+ *   - fulfilled: removes by matching `url`
+ *   - rejected: set `error`
+ * - `clearAllDocuments` (fulfilled/rejected)
+ *   - fulfilled: empties `documents`
+ *   - rejected: set `error`
+ * - `markDocumentAsRead` / `markDocumentAsUnread` (fulfilled/rejected)
+ *   - fulfilled: flip `read` flag for the matching `id`
+ *   - rejected: set `error`
+ *
+ * Notes:
+ * - Only `fetchDocuments` toggles the top-level `loading`.
+ * - Insert order is newest-first due to `unshift`.
+ */
+
 import { createSlice } from '@reduxjs/toolkit';
 import {
     fetchDocuments,

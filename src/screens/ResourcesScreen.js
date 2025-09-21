@@ -1,3 +1,35 @@
+// src/screens/ResourcesScreen.js
+/**
+ * ResourcesScreen.js
+ *
+ * Purpose:
+ * Screen providing quick access to emergency shortcuts and user documents,
+ * wrapped with pull-to-refresh behavior and a persistent footer.
+ *
+ * Key Responsibilities:
+ * - **Font Loading**: Uses `expo-font` to load "Poppins" / "PoppinsBold".
+ *   Shows an ActivityIndicator + "Loading fonts..." until loaded.
+ * - **Pull-to-Refresh**: Implements `RefreshControl` on FlatList. On refresh,
+ *   sets `refreshing=true`, then clears it after 1 second (dummy behavior).
+ * - **Header/Footer Composition**:
+ *   - `EmergencyShortcuts` module
+ *   - `DocumentsScreen` module
+ *   - `Footer` component (always at the bottom)
+ * - **Styling**: Reads `theme.themeColors` for palette. Fallback primary
+ *   color: `theme.primary || theme.info || '#0078D4'`.
+ *
+ * Rendering Guarantees:
+ * - Shows centered loading state until fonts load.
+ * - Once fonts loaded, renders a FlatList with:
+ *   - Header: EmergencyShortcuts + DocumentsScreen
+ *   - Footer: Footer component
+ *
+ * Store Contracts:
+ * - Reads `theme.themeColors` from Redux.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useState, useCallback } from 'react';
 import {
     View,

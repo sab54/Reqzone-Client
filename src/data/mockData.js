@@ -1,3 +1,24 @@
+
+/**
+ * mockWeatherData.js
+ *
+ * This file contains mock data for weather-related information. The data includes:
+ * 
+ * 1. **Current Weather Data (`mockWeatherData`)**:
+ *    - Contains current weather information, such as temperature, humidity, pressure, wind speed, etc.
+ *    - Structure includes key properties like `coord`, `weather`, `main`, `visibility`, `wind`, etc.
+ *
+ * 2. **Forecast Data (`mockForecastData`)**:
+ *    - Represents hourly forecast data over several hours.
+ *    - Contains detailed information on temperature, wind speed, weather description, etc., for each hour.
+ *    - This mock is useful for testing how the app displays forecasted weather information.
+ * 
+ * Example usage:
+ * - `mockWeatherData` would be used when testing the current weather display.
+ * - `mockForecastData` can be used for testing hourly forecast components.
+ *
+ * Author: Sunidhi Abhange
+ */
 export const mockWeatherData = {
     coord: { lon: -0.1257, lat: 51.5085 },
     weather: [

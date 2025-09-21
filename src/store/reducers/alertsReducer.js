@@ -1,3 +1,36 @@
+// src/store/reducers/alertsReducer.js
+/**
+ * alertsReducer.js
+ *
+ * Manages three related slices:
+ * - **alerts**: user/system alerts with paging flags (`hasMore`, `totalCount`).
+ * - **pendingActions**: actionable items the user can toggle/clear.
+ * - **globalHazards**: country-scoped hazard alerts with a timestamp.
+ *
+ * Action handling:
+ * - `alerts/fetchUserAlerts` (pending/fulfilled/rejected)
+ *   - Loads the full user alerts list in one shot; `totalCount = payload.length`.
+ * - `alerts/fetchAlertsData` (pending/fulfilled/rejected)
+ *   - Paged fetch; page 1 **replaces** list, page >1 **appends**.
+ *   - Also sets `hasMore` and `totalCount` from payload.
+ * - `alerts/markAlertAsRead/fulfilled`
+ *   - Marks a specific alert (`payload.alertId`) as read (id match).
+ * - `alerts/deleteAlert/fulfilled`
+ *   - Removes the alert by id and decrements `totalCount` (floored at 0).
+ * - `alerts/loadPendingActions` (pending/fulfilled/rejected)
+ *   - Manages loading/errors and replaces `pendingActions.data`.
+ * - `TOGGLE_ACTION`
+ *   - Flips `completed` on a matching pending action by id.
+ * - `CLEAR_PENDING_ACTIONS`
+ *   - Empties the pending actions list.
+ * - `alerts/fetchGlobalHazardAlerts` (pending/fulfilled/rejected)
+ *   - Replaces the global hazards block with `{ data, country, timestamp }`.
+ *
+ * Notes:
+ * - Pure reducer; all updates are immutable and replace-only where applicable.
+ * - Missing/undefined payloads default to safe fallbacks (e.g., `[]` for lists).
+ */
+
 const initialState = {
     alerts: {
         data: [],

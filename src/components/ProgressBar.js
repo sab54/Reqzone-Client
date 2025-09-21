@@ -1,3 +1,35 @@
+// Client/src/components/ProgressBar.js
+/**
+ * ProgressBar
+ *
+ * A lightweight, animated progress indicator for gamified XP/level systems in React Native.
+ * It displays the current level, the user's XP, the remaining XP to reach the next level,
+ * and an animated horizontal bar with a linear gradient fill.
+ *
+ * Key functionalities:
+ * - **Animated Progress Fill**: Uses `Animated.Value` and `Animated.timing` to smoothly animate the bar width
+ *   from the previous progress to the new `progress` prop (clamped to [0,1]).
+ * - **XP Counter Animation**: Animates an internal `Animated.Value` for XP changes so the label stays in sync
+ *   with `xp` updates over time.
+ * - **Gradient Styling**: Renders a left-to-right `LinearGradient` (via `expo-linear-gradient`) for the fill,
+ *   with colors sourced from `theme.primary` and `theme.primaryLight` (fallback `#4facfe`).
+ * - **Theme & Layout**: Adapts label and bar styling from the provided `theme` (e.g., `text`, `muted`, `border`,
+ *   `barBackground`) and respects `height` plus any `barStyle` overrides.
+ * - **Next-Level XP Hint**: Computes and displays `xpRemaining = max(nextLevelXP - xp, 0)`.
+ *
+ * Render flow:
+ * 1. Header row displays "Level {level}" and "{xp} XP • {xpRemaining} to next".
+ * 2. Background track (rounded) with a clipped gradient fill.
+ * 3. Percentage label shows `Math.round(progress * 100)` right-aligned beneath the bar.
+ *
+ * Notes:
+ * - `progress` is interpreted as a fractional value in [0,1] and is clamped internally before animation.
+ * - `height` defaults to 12; `barStyle` can be used to inject extra styles on the background track.
+ * - Fonts (`Poppins`, `PoppinsBold`) are referenced by name; ensure they are loaded in your app.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';

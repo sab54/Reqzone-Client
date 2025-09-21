@@ -1,3 +1,31 @@
+// src/store/reducers/newsReducer.js
+/**
+ * newsReducer.js
+ *
+ * Manages paged news results with simple client-side de-duplication.
+ *
+ * State:
+ * - `articles`: current list of articles (array of { url, ... })
+ * - `loading`: fetch-in-flight flag
+ * - `page`: next page index to request (starts at 1)
+ * - `hasMore`: hint that more pages exist (true if the last append had items)
+ * - `totalCount`: total results as reported by the backend/search
+ *
+ * Reducers:
+ * - `setNewsArticles(list)`
+ *   - Replaces `articles` (or [] if falsy), resets `page` to 1,
+ *     sets `hasMore` to `list.length > 0`.
+ * - `appendNewsArticles(list)`
+ *   - Appends unique items by `url` (skip duplicates already present),
+ *     increments `page` by 1, sets `hasMore` to `list.length > 0`.
+ * - `setNewsLoading(boolean)` → toggles `loading`.
+ * - `setNewsTotal(number)` → sets `totalCount` (defaults to 0 for falsy).
+ *
+ * Notes:
+ * - De-duplication is based solely on `url`.
+ * - `page` indicates the next page to ask for after the current state.
+ */
+
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {

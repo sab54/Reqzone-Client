@@ -1,3 +1,34 @@
+// src/store/reducers/loginReducer.js
+/**
+ * loginReducer.js
+ *
+ * Handles authentication flow and user session state.
+ *
+ * State:
+ * - `loading`: async in-flight flag
+ * - `error`: error string, if any
+ * - `user`: authenticated user object (or null)
+ * - `isVerified`: true if OTP verification succeeded
+ *
+ * Reducers:
+ * - `resetAuthState` → resets to initial state
+ *
+ * Extra reducers:
+ * - `verifyOtp` (pending/fulfilled/rejected)
+ *   - pending → loading=true, error cleared, isVerified=false
+ *   - fulfilled → user set from payload, isVerified=true
+ *   - rejected → error set, isVerified=false
+ * - `updateUserLocation` (pending/fulfilled/rejected)
+ *   - pending → loading=true, error cleared
+ *   - fulfilled → updates `user.latitude` / `user.longitude` if user exists
+ *   - rejected → sets error
+ * - `logout.fulfilled` → resets to initial state
+ *
+ * Notes:
+ * - Location updates are skipped if no `user` is present.
+ * - Reset actions (`resetAuthState`, `logout.fulfilled`) always return a clean state.
+ */
+
 import { createSlice } from '@reduxjs/toolkit';
 import { verifyOtp, logout, updateUserLocation } from '../actions/loginActions';
 

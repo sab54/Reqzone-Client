@@ -1,3 +1,53 @@
+// src/screens/Chat/ChatRoomScreen.js
+/**
+ * ChatRoomScreen.js
+ *
+ * Purpose:
+ * Real-time chat room UI with socket presence/typing, offline queuing, and
+ * support for DM/group chats plus quick-action composer (events/poll/location/quiz).
+ *
+ * Key Responsibilities:
+ * - **Bootstrap & Fetch**
+ *   - Joins the chat room via socket (`joinChat`) and listens for:
+ *     - `chat:new_message` → append to list, scroll to bottom.
+ *     - `chat:typing_start`/`chat:typing_stop` → update typing users strip.
+ *   - Fetches messages (`fetchMessages(chatId)`) when empty.
+ *   - Fetches chat meta (`fetchChatById(chatId)`).
+ * - **Connectivity & Queueing**
+ *   - Subscribes to NetInfo; when connection returns, flushes queued messages.
+ *   - If offline, composer enqueues messages via `queuePendingMessage`.
+ * - **Typing**
+ *   - Emits `chat:typing_start` on first keystroke and `chat:typing_stop`
+ *     1.5s after the last keystroke (debounced).
+ * - **Send**
+ *   - Sends trimmed text message via `sendMessage`, with haptic feedback.
+ * - **Read State**
+ *   - When the list is scrolled to bottom, marks the most recent message as
+ *     read via `markChatAsReadThunk(chatId, latestId)`.
+ * - **Quick Actions & Quiz**
+ *   - Long-press send opens `ActionModal`; picks prebuilt payloads (event/poll/
+ *     location) or triggers a quiz prompt and posts a quiz message after
+ *     `generateQuizAI`.
+ *
+ * Rendering:
+ * - Shows "Chat not found." if chat is missing.
+ * - Shows loading spinner while fetching messages.
+ * - Otherwise renders inverted FlatList of messages, typing indicator, and composer.
+ *
+ * Store Contracts:
+ * - Reads `theme.themeColors`, `chat.activeChats`, `chat.loading`,
+ *   selectors `selectMessagesByChatId(chatId)`, `selectTypingUsersByChatId(chatId)`.
+ * - Dispatches: `fetchMessages`, `fetchChatById`, `sendMessage`,
+ *   `queuePendingMessage`, `flushQueuedMessages`, `markChatAsReadThunk`,
+ *   reducer helpers `appendMessage`, `setTypingUser`, `removeTypingUser`.
+ *
+ * Notes:
+ * - Effects may double-fire in React 18 Strict Mode; tests assert "was called"
+ *   not exact counts.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, {
     useEffect,
     useRef,

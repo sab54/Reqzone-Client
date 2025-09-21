@@ -1,3 +1,44 @@
+/**
+ * QuizScreen.js
+ *
+ * This screen implements the interactive Disaster Quiz feature where users answer
+ * multiple-choice questions, track their score, and earn XP rewards.
+ *
+ * Key functionalities:
+ * - **Quiz Fetching**:
+ *   - On mount, dispatches `getQuizById(quizId)` to load quiz content.
+ *   - Uses Redux selectors to read `quiz`, `isLoadingQuiz`, and `theme`.
+ *
+ * - **Question Flow**:
+ *   - Maintains `currentIndex` to track which question is being shown.
+ *   - Supports both single-correct and multiple-correct questions.
+ *   - Handles option selection via `handleSelect`, toggling state accordingly.
+ *
+ * - **Answer Submission**:
+ *   - `handleNext` checks selected answers against the correct set.
+ *   - Updates `answers` array, score counter, and shows feedback.
+ *   - At the end of the quiz:
+ *     - Dispatches `submitQuiz`, `fetchDashboard`, and `fetchUserBadges`.
+ *     - Calculates XP earned and shows results screen.
+ *
+ * - **Result & Feedback**:
+ *   - Displays personalized result titles and messages based on score %.
+ *   - Shows XP earned and a retry option.
+ *   - Triggers confetti animation and toast animation when finishing.
+ *
+ * - **UI & Theming**:
+ *   - Uses `useSafeAreaInsets` to adjust spacing.
+ *   - Applies colors, backgrounds, and borders from the Redux theme.
+ *   - Provides header with back navigation, styled questions, and buttons.
+ *
+ * Notes:
+ * - Uses `MotiView` for answer feedback animations.
+ * - Uses `ConfettiCannon` for celebratory finish effect.
+ * - All animations are wrapped with `Animated` to control toast visibility.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useEffect, useState, useRef } from 'react';
 import {
     View,

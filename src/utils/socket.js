@@ -1,3 +1,56 @@
+/**
+ * socket.js
+ *
+ * Utility wrapper around `socket.io-client` that manages real-time
+ * communication between the client app and the backend via WebSockets.
+ *
+ * Key Functionalities:
+ *
+ * - **initSocket**:
+ *   Initializes a new socket connection with authentication and query params.
+ *   - Establishes a connection using WebSocket transport.
+ *   - Emits a `join_user_room` event once connected (using `userId`).
+ *   - Handles connection lifecycle events: `connect`, `disconnect`, and `connect_error`.
+ *
+ * - **getSocket**:
+ *   Returns the current socket instance (if initialized).
+ *
+ * - **disconnectSocket**:
+ *   Gracefully disconnects the socket, resets internal state, and clears `userId`.
+ *
+ * - **emitEvent**:
+ *   Emits a custom event with data, only if the socket is connected.
+ *
+ * - **onEvent**:
+ *   Subscribes to a socket event and registers a callback listener.
+ *
+ * - **offEvent**:
+ *   Removes a socket event listener by event name.
+ *
+ * - **joinChat / leaveChat**:
+ *   Emits events to join or leave specific chat rooms.
+ *   - Example: `join_chat` or `leave_chat` with `chatId`.
+ *
+ * - **Typing Indicator Events**:
+ *   - `sendTypingStart(chatId, userId)`: Broadcasts that the user started typing.
+ *   - `sendTypingStop(chatId, userId)`: Broadcasts that the user stopped typing.
+ *
+ * Connection Flow:
+ * 1. Call `initSocket({ userId, token, query })` → establishes connection.
+ * 2. On success, the client auto-joins `user_${userId}` private room.
+ * 3. Use `emitEvent`, `onEvent`, or `offEvent` for real-time messaging.
+ * 4. Use `joinChat` / `leaveChat` to manage chat room participation.
+ * 5. Call `disconnectSocket()` on logout/app close to cleanly terminate.
+ *
+ * Notes:
+ * - Relies on `BASE_URL` from config.js as the Socket.IO server endpoint.
+ * - Uses `forceNew: true` to avoid sharing connections across users.
+ * - Maintains `isConnected` flag for safer event emission.
+ * - Console logs help trace socket lifecycle in development.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import { io } from 'socket.io-client';
 import { BASE_URL } from './config';
 

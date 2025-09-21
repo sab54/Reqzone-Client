@@ -1,3 +1,45 @@
+/**
+ * documentsActions.js
+ *
+ * Redux Toolkit async thunks for user documents:
+ *
+ * Exports:
+ * - **fetchDocuments()**
+ *   - Loads all documents for the current user via `GET ${API_URL_DOCUMENTS}/:user_id`.
+ *   - Maps each item to:
+ *       { ...doc, file_url: `${BASE_URL}${doc.file_url}`, read: !!doc.read_at }
+ *   - Rejects with a string message on failure.
+ *
+ * - **addDocument(doc)**
+ *   - Validates input (requires current user id, doc.url, doc.title).
+ *   - Posts an enriched document `{ ...doc, user_id, uploadedAt: ISOString }` to `${API_URL_DOCUMENTS}`.
+ *   - Returns the enriched document.
+ *
+ * - **removeDocument(doc)**
+ *   - Validates input (requires current user id and doc.url).
+ *   - Sends `del(${API_URL_DOCUMENTS}, { user_id, url: doc.url })`.
+ *   - Returns the removed document URL.
+ *
+ * - **clearAllDocuments()**
+ *   - Validates user id; calls `del(${API_URL_DOCUMENTS}/all, { user_id })`.
+ *   - Returns `true` on success.
+ *
+ * - **markDocumentAsRead({ documentId })**
+ *   - Posts `{ user_id, document_id }` to `${API_URL_DOCUMENTS}/read`.
+ *   - Returns the numeric/string `documentId`.
+ *
+ * - **markDocumentAsUnread({ documentId })**
+ *   - Deletes `{ user_id, document_id }` at `${API_URL_DOCUMENTS}/read`.
+ *   - Returns the numeric/string `documentId`.
+ *
+ * Notes:
+ * - Uses `get`, `post`, `del` from `utils/api`, `API_URL_DOCUMENTS` from `utils/apiPaths`,
+ *   and `BASE_URL` from `utils/config`.
+ * - All thunks surface user-friendly messages via `rejectWithValue`.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { get, post, del } from '../../utils/api';
 import { API_URL_DOCUMENTS } from '../../utils/apiPaths';

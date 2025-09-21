@@ -1,3 +1,47 @@
+// Client/src/utils/api.js
+/**
+ * api.js
+ *
+ * This utility module provides a **secure wrapper** around the native `fetch` API
+ * to ensure all network communication is properly encrypted and decrypted.
+ *
+ * Key Functionalities:
+ * - **Request Encryption**:
+ *   - Outgoing requests (`POST`, `PUT`, `PATCH`, `DELETE`) have their bodies encrypted using `encryptBody`.
+ *   - `GET` and `DELETE` requests serialize params or send them as an encrypted `payload` query string.
+ *
+ * - **Response Handling**:
+ *   - All responses are parsed as JSON.
+ *   - If the response has a `payload`, it is decrypted via `decryptBody` before being returned.
+ *   - If `decryptBody` fails, the function throws `"Invalid encrypted response"`.
+ *   - Non-OK responses (`response.ok === false`) throw with the server-provided `message` or a fallback message.
+ *
+ * - **Helper Utilities**:
+ *   - `getHeaders`: Constructs headers with `Content-Type: application/json` and merges any extra headers.
+ *   - `serializeParams`: Safely encodes key-value params into a query string.
+ *
+ * API Methods:
+ * - `get(endpoint, params, headers)`
+ * - `post(endpoint, body, headers)`
+ * - `put(endpoint, body, headers)`
+ * - `patch(endpoint, body, headers)`
+ * - `del(endpoint, params, headers)`
+ *
+ * Middleware Flow:
+ * 1. Accepts endpoint + optional params/body + optional headers.
+ * 2. Encrypts the request payload.
+ * 3. Sends the request with correct HTTP method and headers.
+ * 4. Parses the response and attempts decryption if a payload exists.
+ * 5. Throws an error for invalid responses or decryption failures.
+ *
+ * Notes:
+ * - Relies on `BASE_URL` from `config.js` for endpoint resolution.
+ * - Depends on `encryptBody` and `decryptBody` from `crypto.js`.
+ * - Ensures security consistency across all client-server communication.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import { BASE_URL } from './config';
 import { encryptBody, decryptBody } from './crypto';
 

@@ -1,4 +1,48 @@
 // src/components/WeatherCard.js
+/**
+ * WeatherCard.js
+ *
+ * A reusable card component that displays current weather conditions,
+ * condition-based alerts, and an optional multi-day forecast.
+ *
+ * Features:
+ *  - **Header & Toggle**
+ *    - "Weather Overview" header with expand/collapse for forecast.
+ *    - Smooth expand/collapse animations (LayoutAnimation).
+ *
+ *  - **Current Conditions**
+ *    - Displays city, temperature (°C/°F toggle), feels-like, humidity, wind speed, and description.
+ *    - Uses `MaterialCommunityIcons` for weather condition icons.
+ *
+ *  - **Unit Switching**
+ *    - Switch between Celsius and Fahrenheit with a toggle button.
+ *
+ *  - **Alerts**
+ *    - Uses `createConditionBasedAlerts` (from utils) to generate actionable vs informational alerts.
+ *    - Displays severity, description, and optional precautions.
+ *    - Falls back to `getCalmFallbackMessage` when no alerts are actionable.
+ *
+ *  - **Forecast**
+ *    - Horizontally scrollable 5-day forecast (dates, icons, temps, and conditions).
+ *    - Handles both array input and `{ list: [] }` shape for forecast data.
+ *    - Shows loading indicator while forecast is toggling.
+ *
+ *  - **Loading & Empty State**
+ *    - Shows spinner when weather is loading.
+ *    - Shows "No weather data available" when no data is present.
+ *
+ * Props:
+ *  - `weatherData` (object): Current weather data (OpenWeather-like shape).
+ *  - `forecastData` (array|object): Forecast data (array of days or object with `.list`).
+ *  - `loadingWeather` (boolean): Controls loading spinner for current conditions.
+ *  - `theme` (object): Theme colors used for background, borders, text, icons, etc.
+ *
+ * Dependencies:
+ *  - `react-native` for UI primitives and animation
+ *  - `@expo/vector-icons` (Ionicons, MaterialCommunityIcons)
+ *  - `../utils/weatherAlerts` (createConditionBasedAlerts, getAlertIconName, getCalmFallbackMessage)
+ */
+
 import React, { useMemo, useState } from 'react';
 import {
   View,

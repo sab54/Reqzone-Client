@@ -1,3 +1,40 @@
+// Client/src/components/SearchBar.js
+/**
+ * SearchBar
+ *
+ * An animated, debounced search input for React Native with optional voice action.
+ * It manages focus state, interpolates a highlight border, debounces text changes,
+ * and exposes clear & submit behaviors that match common mobile search patterns.
+ *
+ * Key functionalities:
+ * - **Controlled Text State**: Initializes from `query` prop and mirrors user edits via internal state.
+ * - **Debounced onChange**: Calls `onChange` using lodash `debounce` (default 300ms).
+ * - **Animated Border**: Interpolates border color between `theme.card` and `theme.accent`/`theme.primary`
+ *   on focus/blur using `Animated.timing`.
+ * - **Clear Button**: Fades in/out based on input length and clears the field (refocuses input) when tapped.
+ * - **Submit Behavior**: Triggers `onSubmit` with the current text on the keyboard “search” action and dismisses the keyboard.
+ * - **Optional Voice Button**: When `showVoice` is true, renders a mic icon and placeholder press handler.
+ *
+ * Render flow:
+ * 1. Root `Animated.View` styled by theme + animated `borderColor`.
+ * 2. Leading search icon, middle `TextInput`, trailing clear button (animated), optional mic button.
+ *
+ * Props:
+ * - `query: string` — initial text.
+ * - `onChange: (text: string) => void` — debounced change handler.
+ * - `theme: { text, card, input, accent, primary }` — color tokens used in the UI.
+ * - `placeholder?: string` — defaults to "Search...".
+ * - `debounceTime?: number` — defaults to 300ms.
+ * - `onSubmit?: (text: string) => void` — called on submit.
+ * - `showVoice?: boolean` — toggles mic button.
+ *
+ * Notes:
+ * - Uses `Animated` with `useNativeDriver: false` for color interpolation.
+ * - Accessibility: the input has label "Search input", hint "Enter text to search", role "search".
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import {
     View,

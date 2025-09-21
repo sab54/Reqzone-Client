@@ -1,3 +1,58 @@
+/**
+ * NewsAndBookmarks.js
+ *
+ * The News & Bookmarks screen provides a unified interface for browsing
+ * live news articles and managing locally saved bookmarks. It supports
+ * tabbed navigation between the two modes and offers category filtering,
+ * search, sorting, swipe actions, and confirmation modals for destructive
+ * operations.
+ *
+ * Key functionalities:
+ * - **Tabs (News / Bookmarks)**:
+ *   - "📰 News": Fetches paginated news articles from the API.
+ *   - "🔖 Bookmarks": Displays locally saved bookmarks with filtering,
+ *     sorting, and management options.
+ *
+ * - **News Feed**:
+ *   - Fetches news articles via `fetchNewsData(category, page)`.
+ *   - Supports infinite scrolling / "Load more" pagination.
+ *   - Local search filter by article title.
+ *   - Category selector (Flood, Fire, Earthquake, etc.).
+ *   - Swipe actions:
+ *     - Bookmark/unbookmark an article.
+ *     - Open article URL in the system browser.
+ *   - Pressing an article row also opens the article in the browser.
+ *
+ * - **Bookmarks**:
+ *   - Bookmarks are loaded on mount via `loadBookmarks()`.
+ *   - Local search and category filter for saved articles.
+ *   - Sort toggle: "recent" vs. alphabetical (A–Z).
+ *   - "Clear All" action with confirmation modal removes all bookmarks
+ *     using `clearBookmarksAndPersist()`.
+ *   - Secondary action on an individual bookmark triggers a confirmation
+ *     modal before removing it via `removeBookmark(article)`.
+ *   - "Suggest Bookmark" button switches the tab back to News.
+ *
+ * - **Confirmation Modals**:
+ *   - Used for removing individual bookmarks and clearing all bookmarks.
+ *   - Reuses shared `ConfirmationModal` component with configurable labels.
+ *
+ * Data flow:
+ * 1. On mount → load bookmarks from persistent storage.
+ * 2. When News tab active → fetch first page of news for selected category.
+ * 3. When category changes → reset page and refetch news.
+ * 4. When "Load more" → fetch subsequent news pages.
+ * 5. Swipe/bookmark actions → update Redux bookmarks state.
+ *
+ * Notes:
+ * - Child components (`Tabs`, `SwipeableList`, `SwipeActions`, `ArticleList`,
+ *   `HorizontalSelector`, `SearchBar`, `ConfirmationModal`) are used purely
+ *   for presentation and interaction; this screen orchestrates data flow.
+ * - Uses `Linking.openURL` for navigation to external articles.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 import {
     Text,

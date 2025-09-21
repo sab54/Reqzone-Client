@@ -1,3 +1,51 @@
+/**
+ * Tabs.js
+ *
+ * A lightweight, customizable tab bar component with an animated underline indicator.
+ * Designed for React Native + Expo apps, it allows users to switch between different
+ * sections via horizontal tabs.
+ *
+ * Key Functionalities:
+ * - **Render Tabs**: Displays each tab from the `tabs` prop, supporting labels and disabled states.
+ * - **Selection & Callback**: Calls `onTabSelect(key)` when a tab is pressed, unless disabled.
+ * - **Animated Indicator**: Uses `Animated.spring` to smoothly move an underline indicator
+ *   beneath the active tab.
+ * - **Responsive Layout**: On layout, dynamically calculates tab width based on container width
+ *   and number of tabs to size and position the indicator correctly.
+ * - **Scrollable Mode**: When `scrollable` is true, wraps tabs in a horizontal `ScrollView`
+ *   for variable-width tabs; otherwise lays them out evenly.
+ *
+ * Props:
+ * - `tabs` (Array<{ key: string, label: string, disabled?: boolean }>)
+ *   List of tab definitions, each with a unique key and label.
+ * - `selectedTab` (string)
+ *   The key of the currently selected tab.
+ * - `onTabSelect` (function)
+ *   Callback invoked with a tab’s key when pressed.
+ * - `theme` (object, optional)
+ *   Provides colors and styles:
+ *     - `primary`: selected tab text & indicator color
+ *     - `text`: unselected tab text color
+ *     - `muted`: disabled tab text color
+ *     - `surface`: background color of the tab row
+ *     - `border`: bottom border color of the tab row
+ * - `scrollable` (boolean, default: false)
+ *   Enables horizontal scrolling for the tab row.
+ * - `indicatorColor` (string, optional)
+ *   Overrides the underline indicator color. Defaults to `theme.primary` or `#4B7BE5`.
+ *
+ * Animation Flow:
+ * 1. Compute selected tab index from `tabs` and `selectedTab`.
+ * 2. Run `Animated.spring(indicatorAnim, { toValue: index, useNativeDriver: false })`.
+ * 3. Interpolate `indicatorAnim` to map to horizontal `translateX` of the indicator.
+ *
+ * Accessibility:
+ * - Each tab is rendered as a `TouchableOpacity` with `accessibilityRole="button"`
+ *   and appropriate `accessibilityState` (selected/disabled).
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 import {
     View,

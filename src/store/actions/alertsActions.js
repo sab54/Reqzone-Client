@@ -1,3 +1,46 @@
+// src/store/thunks/alertsThunks.js
+/**
+ * alertsThunks.js
+ *
+ * Async thunks for fetching and managing alert data from multiple sources:
+ * - Global hazard feeds (US NWS CAP, UK Met Office RSS)
+ * - App backend system + user alerts
+ * - CRUD-like actions (create, mark-as-read, delete)
+ * - Pending actions (mock or live)
+ *
+ * Main thunks:
+ * - **fetchGlobalHazardAlerts**: Detects user country via geolocation + reverse-geocode,
+ *   fetches the appropriate regional XML feed, parses to JSON, normalizes entries,
+ *   and returns a structured payload `{ alerts, country, count, timestamp }`.
+ *
+ * - **fetchUserAlerts(userId)**: Loads user-specific alerts from the backend.
+ *
+ * - **fetchAlertsData({ category, page, pageSize, fullSystemFetch, userId })**:
+ *   When `fullSystemFetch` is true, fetches *all* system alerts (optionally with `userId`
+ *   so the API can include read-state). Otherwise, fetches a paginated/category-filtered set.
+ *
+ * - **createSystemAlert(payload)**, **createEmergencyAlert(payload)**:
+ *   Create alerts in the backend and return the API response.
+ *
+ * - **markAlertAsRead({ alertId, alertType, userId })**:
+ *   Marks the given alert as read on the server and returns `{ alertId, response, alertType }`.
+ *
+ * - **deleteAlert(alertId)**: Deletes the alert on the server and returns the `alertId`.
+ *
+ * - **loadPendingActions()**: Returns mock pending actions in DEV mode; otherwise queries the API.
+ *
+ * Helpers:
+ * - **normalizeAlertEntry(entry, country)**: Converts feed-specific items into a consistent alert object.
+ * - **parseXml(xml)**: Promise wrapper over `react-native-xml2js` `parseString`.
+ *
+ * Notes:
+ * - Network calls are performed via `utils/api` helpers (`get`, `post`, `patch`, `del`) and `fetch` (for XML feeds).
+ * - The GB feed lacks consistent CAP date fields; `effective` and `expires` are set to `null` for GB.
+ * - All thunks return `rejectWithValue(message)` on error for predictable reducer handling.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { get, post, patch, del } from '../../utils/api';
 import { API_URL_ALERTS } from '../../utils/apiPaths';

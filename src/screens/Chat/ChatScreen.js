@@ -1,3 +1,48 @@
+// src/screens/Chat/ChatScreen.js
+/**
+ * ChatScreen.js
+ *
+ * Purpose:
+ * Inbox-style chat list with pull-to-refresh, socket-driven live updates,
+ * geofenced “local group” prioritization, and a FAB to start chats or join a
+ * local group using current location.
+ *
+ * Key Responsibilities:
+ * - **Font Loading**: Uses `expo-font`; shows spinner + "Loading fonts..." until ready.
+ * - **Bootstrap/Refresh**:
+ *   - On focus and socket connect/reconnect → dispatches `fetchActiveChats()`.
+ *   - Pull-to-refresh calls `fetchActiveChats()` and toggles `refreshing`.
+ * - **Socket Live Updates**:
+ *   - Initializes socket via `initSocket({ userId })`.
+ *   - Subscribes `onEvent('chat:list_update', ...)` and debounces 200ms, then
+ *     dispatches `updateActiveChatsFromSocket(chats)`.
+ * - **Location**:
+ *   - On mount, requests location permission; if granted, caches current coords.
+ *   - FAB → "Join Local Group" asks permission, reverse geocodes (Expo first,
+ *     fallback to `reverseGeocode` util), then dispatches `joinLocalGroup(...)`
+ *     and navigates to `ChatRoom` with the returned `chat_id`.
+ * - **Sorting**:
+ *   - Local groups (within their `radius_km` of current coords) float to top.
+ *   - Otherwise sorts by `updated_at` desc.
+ * - **Rendering**:
+ *   - Loading state: "Loading chats..." with spinner.
+ *   - Empty state: illustration + "No chats yet. Start one!", pull-to-refresh enabled.
+ *   - Non-empty: renders `ChatList` + persistent `Footer`.
+ *   - Always shows a floating FAB to open `ActionModal`.
+ *
+ * Store Contracts:
+ * - Reads `theme.themeColors`, `auth.user.id`, `chat` slice fields
+ *   (`activeChats`, `loading`, `error`, `messagesByChatId`, `lastReadByChatId`).
+ * - Dispatches: `fetchActiveChats`, `joinLocalGroup`,
+ *   reducer action `updateActiveChatsFromSocket`.
+ *
+ * Notes:
+ * - Effects may fire twice in React 18 Strict Mode; tests assert "was called"
+ *   not exact counts.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
     View,

@@ -1,3 +1,33 @@
+// src/store/actions/badgesActions.js
+/**
+ * badgesActions.js
+ *
+ * Redux Toolkit async thunks for managing badges:
+ * - Fetch all available badges
+ * - Fetch badges earned by a specific user
+ * - Manually award a badge to a user
+ *
+ * Thunks:
+ * - **fetchAllBadges()**
+ *   GET `${API_URL_BADGES}` → returns `response.badges` or `[]`.
+ *
+ * - **fetchUserBadges(userId)**
+ *   GET `${API_URL_BADGES}/user/${userId}` → returns `response.earned` or `[]`.
+ *
+ * - **awardBadgeToUser({ userId, badgeId })**
+ *   POST `${API_URL_BADGES}/award` with `{ user_id, badge_id }` → returns API response as-is.
+ *
+ * Error Handling:
+ * - Each thunk catches errors and returns `rejectWithValue(message)` where `message`
+ *   is `error.message` or a readable fallback.
+ *
+ * Notes:
+ * - Network helpers come from `utils/api` (`get`, `post`).
+ * - URL base constant comes from `utils/apiPaths` (`API_URL_BADGES`).
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { API_URL_BADGES } from '../../utils/apiPaths';
 import { get, post } from '../../utils/api';

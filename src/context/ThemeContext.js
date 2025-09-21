@@ -1,3 +1,30 @@
+/**
+ * ThemeContext.js
+ *
+ * Provides app-wide theme state and actions, bridging Redux, AsyncStorage, and the system color scheme.
+ *
+ * Key functionalities:
+ * - **Initial Load**
+ *   - Reads `themeMode` from AsyncStorage (`'light' | 'dark' | 'system'`, default `'system'`).
+ *   - Dispatches `setThemeMode(saved || 'system')`.
+ * - **Effective Dark Mode**
+ *   - Whenever `themeMode` or system scheme changes, dispatches `setEffectiveDarkMode(boolean)` where:
+ *       - If mode is `'system'`: uses `useColorScheme()` (`'dark'` → true).
+ *       - If mode is `'dark'`: true.
+ *       - If mode is `'light'`: false.
+ * - **toggleTheme()**
+ *   - Cycles mode: `light → dark → system → light`.
+ *   - Persists new mode to AsyncStorage, dispatches `setThemeMode(nextMode)` and `setEffectiveDarkMode(resolved)`.
+ *
+ * Exposed context value:
+ * - `isDarkMode` (boolean)
+ * - `themeMode`  ('light' | 'dark' | 'system')
+ * - `themeColors` (palette from Redux)
+ * - `toggleTheme` (function)
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { createContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';

@@ -1,3 +1,37 @@
+// src/screens/OTPVerificationScreen.js
+/**
+ * OTPVerificationScreen.js
+ *
+ * Purpose:
+ * Screen to verify a 6-digit One-Time Password (OTP) for login/2FA.
+ *
+ * Key Responsibilities:
+ * - **Input UX**: Six single-char inputs that auto-advance as the user types.
+ *   When all six digits are filled, the screen auto-submits verification.
+ * - **Auto-fill & Auto-verify**: If `route.params.autoFillOtp` is true and
+ *   `route.params.otpCode` is a 6-digit string, prefill inputs and dispatch
+ *   `verifyOtp` automatically.
+ * - **Resend Flow**: Starts a 30s countdown after which a “Resend OTP” button
+ *   appears. Tapping it clears inputs, resets the timer, focuses the first box,
+ *   and dispatches `requestOtp`.
+ * - **State-driven UI**: Shows loading spinner inside the Verify button when
+ *   `auth.loading` is true and renders an error text when `auth.error` exists.
+ * - **Navigation**: On successful verification (`auth.isVerified`), resets
+ *   navigation to `MainTabs`. Back button navigates to `Login`.
+ *
+ * Store/Action Contracts:
+ * - Reads `theme.themeColors` for colors and typography consistency.
+ * - Reads `auth.loading`, `auth.error`, `auth.isVerified` from the auth slice.
+ * - Dispatches `verifyOtp({ user_id, otp_code })` and
+ *   `requestOtp({ phone_number, country_code })`.
+ *
+ * Notes:
+ * - Effects may fire twice in React 18 strict mode during tests; assertions
+ *   target “was called” rather than exact call counts.
+ *
+ * Author: Sunidhi Abhange
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import {
     View,
